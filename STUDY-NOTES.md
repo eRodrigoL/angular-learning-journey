@@ -232,3 +232,205 @@ node -v && npm -v
 ---
 
 ---
+
+## Aula 07 - Ciclo de vida de componentes Angular
+
+> **Ideia central**: _um componente passa por fases_ (criação → projeção de conteúdo → renderização da view → atualizações → limpeza).
+> Cada _hook_ existe para resolver um tipo de necessidade. Use o ponto certo para cada ação.
+
+---
+
+### Ordem de execução (resumo mental)
+
+1. `constructor()`
+2. `ngOnChanges(changes)` _(quando houver `@Input()`)_
+3. `ngOnInit()`
+4. **Content projection**
+   - `ngAfterContentInit()`
+   - `ngAfterContentChecked()` (pode repetir a cada verificação)
+5. **View**
+   - `ngAfterViewInit()`
+   - `ngAfterViewChecked()` (pode repetir a cada verificação)
+6. `ngDoCheck()` _(se você criar detecção customizada; roda com alta frequência)_
+7. `ngOnDestroy()` _(onde limpar recursos)_
+
+> Observação: `ngOnChanges` dispara **antes** do `ngOnInit` e sempre que um `@Input()` mudar.
+
+---
+
+### Quando usar **cada um**
+
+- **`constructor()`**
+  Injete dependências e inicialize **estado leve**. **Não** acesse o DOM nem dados de `@Input()` (ainda não foram setados).
+
+- **`ngOnInit()`** (`implements OnInit`)
+  Componente está pronto para iniciar lógica inicial.  
+  **Use para**: carregar dados iniciais, configurar _subscriptions_ (com limpeza planejada), iniciar timers/efeitos.
+
+- **`ngOnChanges(changes)`** (`implements OnChanges`)
+  Reage a **mudanças de `@Input()`** — inclusive a primeira atribuição.
+  **Use para**: recalcular algo quando o pai mudar um `@Input`.
+
+- **`ngDoCheck()`** (`implements DoCheck`)
+  Hook de **detecção customizada** (roda muito).
+  **Use raramente**: apenas quando `OnChanges` não cobre (ex.: comparação profunda de objetos mutáveis).
+  **Cuidado**: pode afetar performance.
+
+- **`ngAfterContentInit()` / `ngAfterContentChecked()`**
+  Relacionados à **projeção de conteúdo** (`<ng-content>`).
+  **Use para**: interagir com conteúdo projetado via `@ContentChild/@ContentChildren`.
+  `AfterContentChecked` roda repetidamente em cada ciclo de verificação.
+
+- **`ngAfterViewInit()` / `ngAfterViewChecked()`**
+  A **view** e os `@ViewChild/@ViewChildren` já existem.
+  **Use para**: acessar elementos do template, integrações com bibliotecas de UI que dependem do DOM renderizado.
+  `AfterViewChecked` pode rodar muitas vezes; evite lógica pesada aqui.
+
+- **`ngOnDestroy()`** _(verá em outra aula)_
+  **Use para**: cancelar _subscriptions_, _timeouts_, _intervals_, _observers_ do DOM, _listeners_ e qualquer recurso nativo (ex.: `IntersectionObserver`).
+
+---
+
+### Exemplos práticos
+
+**1) `OnInit` + `OnChanges` com `@Input()`**
+
+```ts
+import {
+  Component,
+  Input,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+} from "@angular/core";
+
+@Component({
+  selector: "app-user-card",
+  template: `<h3>{{ user?.name }}</h3>`,
+})
+export class UserCardComponent implements OnInit, OnChanges {
+  @Input() userId!: string;
+  user: { id: string; name: string } | null = null;
+
+  ngOnInit() {
+    // Carregue dependências que não dependem de @Input()
+    // Ex.: inicializar serviços, telemetry, etc.
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes["userId"] && this.userId) {
+      // Reaja imediatamente a mudanças do pai
+      // this.user = ...
+    }
+  }
+}
+```
+
+**2) Content vs View (`AfterContentInit` e `AfterViewInit`)**
+
+```ts
+import {
+  Component,
+  ContentChild,
+  AfterContentInit,
+  ViewChild,
+  AfterViewInit,
+  ElementRef,
+} from "@angular/core";
+
+@Component({
+  selector: "app-panel",
+  template: `
+    <section>
+      <header><ng-content select="[panel-title]"></ng-content></header>
+      <div #contentArea><ng-content></ng-content></div>
+    </section>
+  `,
+})
+export class PanelComponent implements AfterContentInit, AfterViewInit {
+  @ContentChild("titleTpl") titleTpl!: any; // algo vindo de fora via <ng-content>
+  @ViewChild("contentArea") contentArea!: ElementRef; // elemento do próprio template
+
+  ngAfterContentInit() {
+    // Conteúdo projetado disponível (ng-content)
+    // console.log(this.titleTpl);
+  }
+
+  ngAfterViewInit() {
+    // Elementos do template estão no DOM
+    // this.contentArea.nativeElement.focus();
+  }
+}
+```
+
+**3) `DoCheck` (evite, a menos que precise)**
+
+```ts
+import { DoCheck } from "@angular/core";
+
+export class HeavyListComponent implements DoCheck {
+  private prevHash = "";
+
+  ngDoCheck() {
+    // Comparação customizada (cuidado com custo!)
+    // if (this.hash(this.items) !== this.prevHash) { ... }
+  }
+}
+```
+
+---
+
+### Evitar **vazamento de memória** (lifetime seguro)
+
+- Prefira **`async` pipe** no template para _subscriptions_ (`| async`) — o Angular desinscreve automaticamente.
+- Para _subscriptions_ no código:
+  - `takeUntilDestroyed()` (Angular 16+) **ou** `DestroyRef` + `effect()`/`onCleanup()`
+  - Estratégia clássica: `Subject` + `takeUntil()` usando `ngOnDestroy()`.
+
+**Exemplo com `takeUntilDestroyed`**
+
+```ts
+import { Component, OnInit, inject } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { UsersService } from "./users.service";
+
+@Component({
+  selector: "app-users",
+  template: `<!-- lista -->`,
+})
+export class UsersComponent implements OnInit {
+  private users = inject(UsersService);
+
+  ngOnInit() {
+    this.users.stream$.pipe(takeUntilDestroyed()).subscribe();
+  }
+}
+```
+
+> Regra de bolso: **“Abri? Tenho que fechar.”**  
+> Subscriptions, timers, websockets, observers de DOM… limpe tudo no `ngOnDestroy()` _(ou usando utilitários que limpam por você)_.
+
+---
+
+### Erros comuns (e como evitar) [Aula 07]
+
+- **Ler `@Input()` no `constructor`** → `@Input()` ainda não está definido. Use `ngOnInit`/`ngOnChanges`.
+- **Lógica pesada em `AfterViewChecked/AfterContentChecked`** → rodam muitas vezes; mova para `OnInit/AfterViewInit` ou otimize.
+- **Esquecer de desinscrever** → use `async` pipe, `takeUntilDestroyed` ou limpe no `ngOnDestroy`.
+- **Usar `DoCheck` sem necessidade** → prefira `OnChanges`; se precisar, otimize para evitar trabalho redundante.
+
+---
+
+### Checklist rápido
+
+- Precisa de **DI** e setup leve? → `constructor()`
+- Reagir a **mudança de `@Input()`**? → `ngOnChanges()`
+- **Inicialização** (fetch inicial, timers, subs)? → `ngOnInit()`
+- Lidar com **< ng-content >**? → `ngAfterContentInit/Checked()`
+- Acessar **elementos do template** (`@ViewChild`)? → `ngAfterViewInit/Checked()`
+- Detecção **custom**? → `ngDoCheck()` _(apenas se necessário)_
+- **Limpeza** de recursos? → `ngOnDestroy()` _(na próxima aula)_
+
+---
+
+---
