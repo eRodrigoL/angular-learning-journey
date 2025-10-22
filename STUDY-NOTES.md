@@ -126,3 +126,71 @@ ng serve -o
 ---
 
 ---
+
+## Aula 05 - Anatomia de uma App Angular - 20/10/2025
+
+**Visão geral**
+(standalone por padrão)
+
+- Projeto **sem NgModule**: o bootstrap acontece em `main.ts` com `bootstrapApplication(AppComponent, appConfig)`.
+- Configurações globais em `src/app/app.config.ts` (providers como Router, HttpClient, animações etc.).
+- Rotas em `src/app/app.routes.ts` (suporta lazy loading).
+- Componente raiz em `src/app/app.ts` (standalone: true), com template `app.html` e estilos `app.scss`.
+- HTML base em `src/index.html`; estilos globais em `src/styles.scss`.
+- `public/` (na raiz) para arquivos estáticos copiados para o build.
+- `favicon.ico` na raiz do projeto (fora de `src/`).
+- Arquivos de configuração na raiz: `angular.json`, `tsconfig*.json`, `package.json`, `.editorconfig`, `.gitignore`, `README.md`.
+
+**Árvore real do seu projeto**
+(No estágio inicial)
+
+```text
+nome-do-projeto
+├─ .vscode/                    # configs do VS Code do workspace
+├─ node_modules/               # dependências (gerenciado pelo npm)
+├─ public/                     # arquivos estáticos copiados "as is" no build
+│  └─ ...                      # (imagens, ícones extras, manifest, etc.)
+├─ favicon.ico                 # ícone raiz (fora de src/)
+├─ src/
+│  ├─ app/
+│  │  ├─ app.config.ts         # providers globais (Router, HttpClient, animações…)
+│  │  ├─ app.routes.ts         # rotas (suporta lazy loading, guards, resolvers)
+│  │  ├─ app.ts                # AppComponent (standalone: true)
+│  │  ├─ app.html              # template do AppComponent
+│  │  ├─ app.scss              # estilos do AppComponent
+│  │  └─ app.spec.ts           # testes do AppComponent
+│  ├─ index.html               # HTML base (ponto de injeção)
+│  ├─ main.ts                  # bootstrapApplication(AppComponent, appConfig)
+│  └─ styles.scss              # estilos globais da app
+├─ .editorconfig               # padronização de editor (indentação, EOL, charset)
+├─ .gitignore                  # arquivos/pastas ignorados pelo Git
+├─ angular.json                # config do Angular CLI (build/serve/test)
+├─ package.json                # scripts e dependências
+├─ package-lock.json           # lockfile do npm
+├─ README.md                   # documentação do projeto
+├─ tsconfig.json               # tsconfig base
+├─ tsconfig.app.json           # tsconfig da aplicação
+└─ tsconfig.spec.json          # tsconfig dos testes
+```
+
+**Conceitos-chave no Angular 20**
+(que impactam a anatomia)
+
+- **Control Flow moderno**: preferir a nova sintaxe `@if`, `@for`, `@switch`. As diretivas antigas `*ngIf`, `*ngFor`, `*ngSwitch` estão **deprecadas**.
+- **Signals estáveis**: APIs como `signal`, `computed`, `effect` e utilitários (`toSignal` etc.).
+- **Zoneless (opcional)**: iniciar sem Zone.js com `provideZonelessChangeDetection()` em providers.
+- **SSR/hidratação**: _incremental hydration_ disponível; habilitar quando usar SSR (ex.: `provideClientHydration(...)`).
+- **Requisitos**: Node **>= 20.11.1** (ou >= 22.11) e TypeScript **5.8.x**.
+
+**Boas práticas neste layout**
+(E também em outros)
+
+- **Componentes enxutos** + **services** para lógica/IO; componentes focados em UI.
+- **Lazy loading** por feature; manter `app.routes.ts` organizado por áreas.
+- **Providers centralizados** em `app.config.ts`: `provideRouter`, `provideHttpClient`, `provideAnimations` etc.
+- **Migrar templates** para o **control flow novo** (`@if/@for/@switch`) conforme o projeto evoluir.
+- **Padrão de nomes** consistente (`feature-name.component.ts`, `feature-name.routes.ts` etc.) e adoção de `core/`, `shared/`, `features/`.
+
+---
+
+---
