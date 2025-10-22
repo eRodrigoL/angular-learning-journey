@@ -434,3 +434,214 @@ export class UsersComponent implements OnInit {
 ---
 
 ---
+
+## Aula 08 — Tipos de Data Binding no Angular
+
+> **Ideia central**: _binding_ é a forma de **sincronizar dados** entre **classe (TypeScript)** e **template (HTML)**.  
+> No Angular temos **4 formas** principais:
+>
+> - **interpolação**,
+> - **property binding**,
+> - **event binding** e
+> - **two-way data binding**.
+
+---
+
+### Visão geral rápida
+
+| Tipo                 | Direção           | Sintaxe                     | Quando usar                                                  |
+| -------------------- | ----------------- | --------------------------- | ------------------------------------------------------------ |
+| **Interpolação**     | Classe → Template | `{{ expressão }}`           | Mostrar valores (texto) no HTML                              |
+| **Property binding** | Classe → Template | `[propriedade]="expressão"` | Definir **propriedades** de elementos/Componentes/Directivas |
+| **Event binding**    | Template → Classe | `(evento)="expressão"`      | Reagir a eventos do DOM/Componentes                          |
+| **Two-way binding**  | Classe ↔ Template | `[(ngModel)]="prop"`        | Inputs com leitura/escrita (formularios simples)             |
+
+---
+
+## 1) Interpolação
+
+- **Direção**: **somente leitura** da classe para o HTML.
+- **Uso típico**: texto, atributos que aceitam _string_ no conteúdo (ex.: dentro de tags).
+
+**Exemplo**:
+
+```ts
+// nome.ts
+title = "Título desejado";
+user = { name: "Ana", score: 42 };
+```
+
+```html
+<!-- nome.html -->
+<h1>{{ title }}</h1>
+<p>Usuário: {{ user.name }} — Pontos: {{ user.score }}</p>
+```
+
+**Boas práticas**:
+
+- Use o **operador de navegação segura** `{{ user?.name }}` quando algo pode ser nulo/indefinido.
+- Evite expressões pesadas (chamar funções caras) dentro de `{{ ... }}`.
+
+---
+
+## 2) Property Binding
+
+- **Direção**: classe → template, **em propriedades reais** do elemento/Componente/Directiva (não apenas atributos HTML).
+- **Vantagem**: trabalha com **tipos** e recursos do DOM/Componentes (ex.: `[disabled]`, `[value]`, `[src]`, `[ngClass]`).
+
+**Exemplo**:
+
+```ts
+// nome.ts
+imgURL = "https://exemplo.com/imagem.png";
+isDisabled = true;
+```
+
+```html
+<!-- nome.html -->
+
+<img [src]="imgURL" alt="Imagem" />
+<button [disabled]="isDisabled">Enviar</button>
+```
+
+**Dicas**:
+
+- Para **atributos** específicos (ex.: `aria-label`): use **attribute binding** → `[attr.aria-label]="rotulo"`.
+- Para **classes/estilos**: `[class.nome]="condicao"`, `[style.width.px]="largura"`.
+
+---
+
+## 3) Event Binding
+
+- **Direção**: template → classe (o template **emite** um evento para o TS reagir).
+- **Uso típico**: cliques, teclas, mudanças de valor, eventos custom de componentes.
+
+**Exemplo**:
+
+```ts
+// nome.ts
+chamarFuncao() {
+// ação a executar quando o botão for clicado
+}
+```
+
+```html
+<!-- nome.html -->
+
+<button (click)="chamarFuncao()">Acionar</button>
+```
+
+**Dicas**:
+
+- Eventos do DOM: `(click)`, `(input)`, `(keyup.enter)`, etc.
+- Componentes filhos podem emitir eventos próprios com `@Output()` → você consome com `(evento)="..."`.
+
+---
+
+## 4) Two-Way Data Binding (Template-driven)
+
+- **Direção**: **mão dupla** (classe ↔ template).
+- **Requisito**: **FormsModule**. Em projetos **standalone**, importe no **componente** (ou em providers via `importProvidersFrom`).
+
+**Exemplo (standalone component)**:
+
+```ts
+// nome.ts
+import { Component } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+
+@Component({
+  selector: "app-nome",
+  standalone: true,
+  imports: [FormsModule],
+  templateUrl: "./nome.component.html",
+})
+export class NomeComponent {
+  title = "Título desejado";
+}
+```
+
+```html
+<!-- nome.html -->
+
+<input [(ngModel)]="title" placeholder="Digite o título" />
+
+<p>Valor atual: {{ title }}</p>
+```
+
+**Observações importantes**:
+
+- O “**banana in a box**” `[( ... )]` é literalmente **property + event** sob o capô.
+- Em formulários com **Reactive Forms**, use **FormControl/ControlName** (não misture com `ngModel` no mesmo controle).
+- Para formularios maiores/complexos, prefira **Reactive Forms** (mais previsíveis e testáveis).
+
+---
+
+## Escolhas e equivalências úteis
+
+- `[value]="prop"` + `(input)="prop = $event.target.value"` **≈** `[(ngModel)]="prop"` (mas `ngModel` exige **FormsModule**).
+- `[src]` **vs** atributo `src`: o binding usa **propriedade** do elemento (aplica tipos/validação do DOM).
+- Segurança: Angular **sanitiza** bindings em URLs/HTML; para casos especiais, use `DomSanitizer` (com cautela!).
+
+---
+
+## Erros comuns (e como evitar) [Aula 08]
+
+- **Esquecer de importar FormsModule** → `[(ngModel)]` não funciona.
+- **Funções caras** em interpolação/bindings → _jank_ de performance (prefira getters/sinais ou pré-computar).
+- **Misturar ngModel com Reactive Forms** no mesmo controle → conflitos e avisos.
+- **Confundir atributo com propriedade**: para bindings, use **propriedade** (`[disabled]`, `[value]`, `[src]`).
+
+---
+
+## Exemplos resumidos
+
+**1) Interpolação**:
+
+```ts
+// nome.ts
+title = "titulo desejado";
+```
+
+```html
+<!-- nome.html -->
+<h1>{{ title }}</h1>
+```
+
+**2) Property binding**:
+
+```ts
+// nome.ts
+imgURL = "link/endereco-da-imagem";
+```
+
+```html
+<!-- nome.html -->
+<img [src]="imgURL" />
+```
+
+**3) Event binding**:
+
+```ts
+// nome.ts
+chamarFuncao() {}
+```
+
+```html
+<!-- nome.html -->
+<button (click)="chamarFuncao()">Clique</button>
+```
+
+**4) Two-way data binding**:
+
+```ts
+// nome.ts (standalone)
+import { FormsModule } from "@angular/forms";
+imports: [FormsModule];
+title = "titulo desejado";
+```
+
+```html
+<!-- nome.html -->
+<input [(ngModel)]="title" />
+```
