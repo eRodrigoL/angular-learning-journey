@@ -194,3 +194,41 @@ nome-do-projeto
 ---
 
 ---
+
+## Aula 06 - Extensões VS Code úteis - 20/10/2025
+
+Instale e configure as extensões abaixo para acelerar o fluxo:
+
+- [Angular Language Service](https://marketplace.visualstudio.com/items?itemName=Angular.ng-template) — _Autocomplete_ e diagnósticos para templates.
+- [Angular Snippets (Version 18) — John Papa](https://marketplace.visualstudio.com/items?itemName=johnpapa.Angular2) — atalhos para gerar estruturas Angular.
+- [Auto Rename Tag](https://marketplace.visualstudio.com/items?itemName=formulahendry.auto-rename-tag) — renomeia automaticamente tags HTML pareadas.
+- [Angular 17 Snippets — BeastCode](https://marketplace.visualstudio.com/items?itemName=Mikael.Angular-BeastCode) — snippets para TS/HTML/Material/NgRx/RxJS/Flex Layout.
+
+### Comandos rápidos (cola de bolso)
+
+```bash
+# criar projeto
+ng new minha-app --routing --style=scss
+
+# rodar local
+cd minha-app && ng serve -o
+
+# gerar artefatos
+ng g component shared/header
+ng g service core/http/api
+
+# checar versões
+ng version
+node -v && npm -v
+```
+
+---
+
+## Execuções realizadas
+
+- Conferi a versão do Angular CLI instalado com `ng version`.
+- Criei projeto com `ng new <nome-do-app>` (ajuste o nome conforme seu caso) e rodei `ng serve -o` para validar o ambiente.
+
+---
+
+---
