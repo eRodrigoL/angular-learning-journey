@@ -32,3 +32,15 @@ Boas-vindas + informações sobre o curso
 ---
 
 ---
+
+## Aula 03 - Documentação Angular - 20/10/2025
+
+- **Site oficial**: [https://angular.dev](https://angular.dev) (Guides, Tutorials, API).
+- **Como ler a doc**:
+  - Comece por _Guides_ e _Tutorials_; depois aprofunde em _API Reference_.
+  - Procure exemplos práticos e diferenças entre versões.
+- **Dica**: salve trechos no seu _snippet manager_ e referencie no código.
+
+---
+
+---
