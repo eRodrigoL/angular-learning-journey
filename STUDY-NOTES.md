@@ -44,3 +44,85 @@ Boas-vindas + informações sobre o curso
 ---
 
 ---
+
+## Aula 04 - Setup de um projeto - 20/10/2025
+
+**Pré-requisitos**
+Verifique Node.js (LTS recomendado) e npm:
+
+```bash
+node -v
+npm -v
+```
+
+**Instalar Angular CLI**
+Opção 1 (mais recente):
+
+```bash
+npm i -g @angular/cli
+ng version
+```
+
+Opção 2 (versão específica):
+
+```bash
+npm i -g @angular/cli@20.3.6
+ng version
+```
+
+**Criar projeto**
+(respostas equivalentes às escolhas feitas no prompt)
+
+```bash
+ng new <nome-do-app>
+# stylesheet format: SCSS
+# Server-Side Rendering (SSR): N
+# zoneless: N
+# AI tools: None
+```
+
+> **Stylesheet Format: Sass (SCSS)**
+>
+> - O que é: pré-processador de CSS com variáveis, mixins, aninhamento etc.
+> - Por que escolher: estilos mais organizados e reutilizáveis.
+> - Alternativas: CSS, Sass (indented), Less (dependendo do preset).
+> - Impacto: o projeto nasce com arquivos `.scss` e build já configurado.
+
+.
+
+> **SSR/SSG: No**
+>
+> - O que é: SSR renderiza HTML no servidor (melhora SEO/TTFB); SSG gera HTML estático no build.
+> - Por que “No”: simplifica o começo (menos camadas/deploys).
+> - Quando “Yes”: apps públicas com SEO/preview/primeiro carregamento crítico.
+> - Como ligar depois: `ng add @angular/ssr` (cria setup para SSR/Prerender).
+
+.
+
+> **Zoneless (sem zone.js): No**
+>
+> - O que é: remove zone.js e usa detecção de mudanças orientada por **Signals**.
+> - Por que “No”: caminho tradicional; muitos exemplos/libs assumem zone.js.
+> - Quando “Yes”: foco em performance/controle fino de change detection.
+> - Observação: zoneless exige padrões mais explícitos para atualizar a UI.
+
+.
+
+> **AI Tools: None**
+>
+> - O que é: a CLI pode pré-configurar integrações (prompts, regras, snippets).
+> - Por que “None”: evita ruído no começo; pode adicionar depois.
+> - Se escolher outra: a CLI cria arquivos/configs de boas práticas da ferramenta.
+
+**Rodando o projeto**
+A opção **`-o`** (`--open`) abre o navegador automaticamente em `http://localhost:4200` ao terminar a compilação.  
+Sem **`-o`**, abra manualmente: `http://localhost:4200`.
+
+```bash
+cd <nome-do-app>
+ng serve -o
+```
+
+---
+
+---
