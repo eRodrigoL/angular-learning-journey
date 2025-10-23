@@ -233,7 +233,149 @@ node -v && npm -v
 
 ---
 
-## Aula 07 - Ciclo de vida de componentes Angular
+## Aula 07 — O que são **Componentes** no Angular
+
+> **Definição**: componente é a **unidade básica de UI** no Angular.  
+> Junta **lógica** (classe TypeScript), **template** (HTML), **estilos** (CSS/SCSS) e **metadados** (decorator `@Component`).  
+> Em apps modernas (v20), os componentes são **standalone por padrão** e se conectam via **Inputs/Outputs**, **rotas** e **serviços**.
+
+Ou seja: **Componente = unidade de UI** com TS + HTML + estilos (opcionalmente + testes).
+
+---
+
+---
+
+## Aula 07 - [EXTRA] Pesquisa pessoal
+
+O curso cujo este repositório acompanha foi gravado com Angular **v19**.
+Contudo, este repositório usa a versão mais moderna do Angular atualmente, o **Angular 20**
+
+Depois de perceber a mudança na **nomenclatura** dos arquivos gerados pela CLI, descobri também que **Zoneless** agora é opcional e resolvi escrever algumas considerações sobre o Angular 20.
+
+### Mudanças no Angular 20
+
+- **Arquivos com nomes mais simples**
+
+  - **Atual**: o CLI não adiciona mais os sufixos `.component`, `.service`, `.directive` (exemplos de arquivos gerados: **`home.ts`**, **`home.html`**, **`home.scss`**).
+  - **Antigo**: **`home.component.ts`**, **`home.component.html`**, **`home.component.scss`**.
+
+> Porém, alguns geradores continuam incluindo o tipo no nome do arquivo, só que com hífen (não mais com ponto):
+>
+> - Guards → `auth-guard.ts`
+> - Interceptors → `logging-interceptor.ts`
+> - Resolvers → `user-resolver.ts`
+> - Modules → `shared-module.ts`
+> - Pipes → `currency-pipe.ts`
+
+- **Zoneless opcional**
+  - **Atual**: já é possível criar o projeto **sem Zone.js** (detecção de mudanças guiada por **Signals**).
+  - **Antigo**: Zone.js vinha habilitado por padrão e quase onipresente.
+
+> **Resumo:** Angular incentiva **standalone components** + **Signals** para reatividade **mais explícita e performática**.
+
+---
+
+### Anatomia de um componente (v20, standalone)
+
+- **Classe TS** com `@Component` (define `selector`, `templateUrl`/`styles` e **`imports`** para dependências de template).
+- **Template HTML** (marcação + bindings).
+- **Estilos** (scoped ao componente).
+- **Inputs/Outputs** para comunicação com pais/filhos.
+
+**Exemplo mínimo (app raiz)**:
+
+```ts
+// app.ts (standalone por padrão)
+import { Component } from "@angular/core";
+import { RouterOutlet } from "@angular/router";
+
+@Component({
+  selector: "app-root",
+  templateUrl: "./app.html",
+  styleUrls: ["./app.scss"],
+  imports: [RouterOutlet], // dependências usadas no template
+})
+export class AppComponent {
+  title = "Minha App";
+}
+```
+
+```html
+<!-- app.html -->
+<h1>{{ title }}</h1>
+<router-outlet />
+```
+
+> **Antigo (para comparar)**: `AppModule` com `declarations/imports` e `app.component.ts` contendo `standalone: true` (ou nem standalone, dependendo da versão).
+
+---
+
+### Componente de feature (Inputs/Outputs + uso em template)
+
+**Definição**:
+
+```ts
+// product.ts
+import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { CommonModule } from "@angular/common";
+
+@Component({
+  selector: "app-product",
+  templateUrl: "./product.html",
+  styleUrls: ["./product.scss"],
+  imports: [CommonModule], // ex.:  @for/@if (*ngFor, *ngIf em versões anteriores)
+})
+export class ProductComponent {
+  @Input() name = "";
+  @Output() selected = new EventEmitter<string>();
+
+  select() {
+    this.selected.emit(this.name);
+  }
+}
+```
+
+```html
+<!-- product.html -->
+<div class="card">
+  <p>{{ name }}</p>
+  <button (click)="select()">Selecionar</button>
+</div>
+```
+
+**Uso em outro componente**:
+
+```html
+<!-- app.html (trecho) -->
+
+<app-product
+  [name]="'Notebook X'"
+  (selected)="onSelected($event)"
+></app-product>
+```
+
+```ts
+// app.ts (trecho)
+onSelected(name: string) {
+// reagir à escolha do produto
+}
+```
+
+---
+
+### Boas práticas (v20)
+
+- **Imports explícitos no componente**: tudo que o template usa deve estar em **`imports`** (ex.: `RouterOutlet`, diretivas, outros componentes).
+- **Separação de responsabilidades**: lógica em **serviços**, UI em **componentes**.
+- **Reatividade moderna**: considere **Signals** para estado local previsível e rápido.
+- **Adoção gradual**: se herdar código com **NgModules**, é possível **conviver** e migrar quando fizer sentido.
+- **Kebab-case consistente**: nomes de arquivo e selectors com hífen (`user-profile.ts`, `app-user-card`); mantenha mesmo nome base entre `.ts/.html/.css/.spec`.
+
+---
+
+---
+
+## Aula 08 - Ciclo de vida de componentes Angular
 
 > **Ideia central**: _um componente passa por fases_ (criação → projeção de conteúdo → renderização da view → atualizações → limpeza).
 > Cada _hook_ existe para resolver um tipo de necessidade. Use o ponto certo para cada ação.
@@ -412,7 +554,7 @@ export class UsersComponent implements OnInit {
 
 ---
 
-### Erros comuns (e como evitar) [Aula 07]
+### Erros comuns (e como evitar) [Aula 08]
 
 - **Ler `@Input()` no `constructor`** → `@Input()` ainda não está definido. Use `ngOnInit`/`ngOnChanges`.
 - **Lógica pesada em `AfterViewChecked/AfterContentChecked`** → rodam muitas vezes; mova para `OnInit/AfterViewInit` ou otimize.
@@ -435,7 +577,7 @@ export class UsersComponent implements OnInit {
 
 ---
 
-## Aula 08 — Tipos de Data Binding no Angular
+## Aula 09 — Tipos de Data Binding no Angular
 
 > **Ideia central**: _binding_ é a forma de **sincronizar dados** entre **classe (TypeScript)** e **template (HTML)**.  
 > No Angular temos **4 formas** principais:
@@ -585,7 +727,7 @@ export class NomeComponent {
 
 ---
 
-## Erros comuns (e como evitar) [Aula 08]
+## Erros comuns (e como evitar) [Aula 09]
 
 - **Esquecer de importar FormsModule** → `[(ngModel)]` não funciona.
 - **Funções caras** em interpolação/bindings → _jank_ de performance (prefira getters/sinais ou pré-computar).
