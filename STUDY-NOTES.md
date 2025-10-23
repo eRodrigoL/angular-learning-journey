@@ -792,7 +792,7 @@ title = "titulo desejado";
 
 ---
 
-## Aula 10 — Diretivas de decisão com **control flow moderno**: `@if` e `@switch` (Angular v20)
+## Aula 10 — Diretivas de decisão `@if` e `@switch`
 
 > Desde o Angular 17, o **novo control flow** (blocos `@if`, `@switch`, `@for`) substitui as diretivas estruturais antigas (`*ngIf`, `*ngSwitch`, `*ngFor`).  
 > No Angular 20, esse novo padrão é o **recomendado**. As diretivas antigas estão **deprecadas** e têm **remoção prevista** (indicada para v22).
@@ -809,9 +809,9 @@ title = "titulo desejado";
 
 ## 1. `@if` (com `@else` e `@else if`)
 
-- **`@if (condição) { … }**: renderiza o bloco **se** a condição for verdadeira.
-- **`@else { … }**: alternativa quando a condição for falsa.
-- **`@else if (outraCondição) { … }**: encadeia novas verificações sem criar vários níveis de aninhamento.
+- **`@if (condição) { … }`**: renderiza o bloco **se** a condição for verdadeira.
+- **`@else { … }`**: alternativa quando a condição for falsa.
+- **`@else if (outraCondição) { … }`**: encadeia novas verificações sem criar vários níveis de aninhamento.
 
 **Exemplos**:
 
@@ -864,8 +864,8 @@ title = "titulo desejado";
 
 ## 2. `@switch` (com `@case` e `@default`)
 
-- **`@switch (expressão) { … }**: escolhe um bloco a partir do valor da expressão.
-- **`@case (valor) { … }**: ramo executado quando há **igualdade estrita** com a expressão.
+- **`@switch (expressão) { … }`**: escolhe um bloco a partir do valor da expressão.
+- **`@case (valor) { … }`**: ramo executado quando há **igualdade estrita** com a expressão.
 - **`@default { … }`**: caso padrão quando nenhum `@case` corresponde.
 
 **Exemplos**:
@@ -1002,3 +1002,226 @@ export class AppComponent {
 > **Lembrete**: Na **v20** é comum ver arquivos com nomes mais curtos (ex.: `app.ts`, `app.html`, `app.scss`) e tags sem conteúdo em forma **auto-fechada** (ex.: `<router-outlet />`).
 
 ---
+
+---
+
+## Aula 11 — Diretivas estruturais: `@for` (Angular v20)
+
+> Desde o Angular 17, o **novo control flow** (blocos `@if`, `@switch`, `@for`) substitui as diretivas estruturais antigas (`*ngIf`, `*ngSwitch`, `*ngFor`).  
+> No Angular 20, esse novo padrão é o **recomendado**. As diretivas antigas estão **deprecadas** e têm **remoção prevista** (indicada para v22).
+
+---
+
+### Por que usar `@for`?
+
+- **Sintaxe mais clara e previsível** para iteração.
+- **Performance superior** com estratégia de diferenciação eficiente.
+- **Recursos embutidos**:
+  - `@empty` para estado vazio (sem `ng-template` extra).
+  - Variáveis locais: `index`, `count`, `first`, `last`, `even`, `odd`.
+  - **Rastreamento** com `track…` (equivalente ao `trackBy` do antigo).
+  - **Fatiamento** com `slice` e **ordenação** com `orderBy` (quando aplicável; ou compute antes no TS).
+
+---
+
+## 1. `@for` (com `@empty` e `track`)
+
+**Explicações**:
+
+- **`@for (item of lista; track item.id) { … }`**: itera sobre `lista` renderizando o bloco para cada `item`, rastreando por `item.id`.
+- **`@empty { … }`**: ramo renderizado quando a lista está vazia.
+- Variáveis locais fornecidas pelo loop:
+  - `index` (índice 0-base), `count` (tamanho), `first`, `last`, `even`, `odd`.
+
+**Exemplo**:
+
+```html
+@for (item of baseDeDados; track item.nome) {
+<tr>
+  <td>{{ item.nome }}</td>
+  <td>{{ item.sexo }}</td>
+  <td>{{ item.idade }}</td>
+</tr>
+} @empty {
+<tr>
+  <td colspan="3">Sem registros</td>
+</tr>
+}
+```
+
+**Exemplo com variáveis locais**:
+
+```html
+@for (item of baseDeDados; track item.nome; let i = index; let total = count) {
+<tr>
+  <td>{{ i + 1 }} / {{ total }}</td>
+  <td>{{ item.nome }}</td>
+  <td>{{ item.sexo }}</td>
+  <td>{{ item.idade }}</td>
+</tr>
+} @empty {
+<tr>
+  <td colspan="4">Sem registros</td>
+</tr>
+}
+```
+
+**Dicas**:
+
+- **Sempre que possível, use `track`** com uma chave **estável** (id/nome único) para evitar re-renderizações desnecessárias.
+- **Pré-processe** dados no TS (filtro/ordenação/paginação) em vez de lógica pesada no template.
+- Para listas grandes, considere **virtualização** (libs externas) e fragmentar a UI.
+
+---
+
+### Antes (antigo `*ngFor`)
+
+- Exigia atributo estrutural e, para tratar vazio, era comum usar `*ngIf` ou `ng-template`.
+
+```html
+<tr *ngFor="let item of baseDeDados">
+  <td>{{ item.nome }}</td>
+  <td>{{ item.sexo }}</td>
+  <td>{{ item.idade }}</td>
+</tr>
+```
+
+---
+
+## 3. Exemplos “1:1” (mapeando do antigo para o novo)
+
+**Antigo → Novo (com vazio e track)**:
+
+```html
+<!-- Antigo -->
+<tr *ngFor="let item of baseDeDados; trackBy: trackByNome">
+  <td>{{ item.nome }}</td>
+  <td>{{ item.sexo }}</td>
+  <td>{{ item.idade }}</td>
+</tr>
+<!-- (e um *ngIf separado para lista vazia) -->
+
+<!-- Novo -->
+@for (item of baseDeDados; track item.nome) {
+<tr>
+  <td>{{ item.nome }}</td>
+  <td>{{ item.sexo }}</td>
+  <td>{{ item.idade }}</td>
+</tr>
+} @empty {
+<tr>
+  <td colspan="3">Sem registros</td>
+</tr>
+}
+```
+
+**Com índice e paridade**:
+
+```html
+<!-- Antigo -->
+<tr *ngFor="let item of baseDeDados; let i = index; let e = even">
+  <td [class.linha-par]="e">{{ i + 1 }}</td>
+  <td>{{ item.nome }}</td>
+</tr>
+
+<!-- Novo -->
+@for (item of baseDeDados; let i = index; let e = even) {
+<tr [class.linha-par]="e">
+  <td>{{ i + 1 }}</td>
+  <td>{{ item.nome }}</td>
+</tr>
+}
+```
+
+---
+
+## 4. Boas práticas
+
+- **Rastreie** com `track item.id` (ou outra chave única) para melhor desempenho.
+- **Evite funções no template** (ex.: `calculaAlgo(item)`): compute no TS, use **Signals** ou getters baratos.
+- **Divida componentes** quando a linha ficar complexa (melhora legibilidade e reuso).
+- **Mostre estado vazio** com `@empty` (UX melhor).
+
+---
+
+## 5. Erros comuns (e como evitar)
+
+- **Esquecer o `@empty`** e renderizar tabela vazia sem feedback.
+- **Rastreamento instável** (`track index`) → elementos piscando/re-montando; prefira uma chave **estável**.
+- **Mutar arrays diretamente** sem atualizar referência (em listas controladas por Signals/immutability): **crie novo array** ao atualizar.
+
+---
+
+## 6. Exemplo completo (componente simples)
+
+**Classe (`lista.ts`)**:
+
+```ts
+import { Component } from "@angular/core";
+import { NgClass } from "@angular/common";
+
+type Pessoa = {
+  nome: string;
+  sexo: "feminino" | "masculino";
+  idade: number;
+};
+
+@Component({
+  selector: "app-lista",
+  standalone: true,
+  imports: [NgClass],
+  templateUrl: "./lista.html",
+  styleUrls: ["./lista.scss"],
+})
+export class ListaComponent {
+  baseDeDados: Pessoa[] = [
+    { nome: "nome1", sexo: "feminino", idade: 20 },
+    { nome: "nome2", sexo: "masculino", idade: 37 },
+    { nome: "nome3", sexo: "masculino", idade: 18 },
+    { nome: "nome4", sexo: "feminino", idade: 63 },
+  ];
+}
+```
+
+**Template (`lista.html`)** — usando `@for`, `@empty` e variáveis locais:
+
+```html
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Nome</th>
+      <th>Sexo</th>
+      <th>Idade</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @for (item of baseDeDados; track item.nome; let i = index; let total =
+    count; let e = even) {
+    <tr [class.linha-par]="e">
+      <td>{{ i + 1 }}/{{ total }}</td>
+      <td>{{ item.nome }}</td>
+      <td>{{ item.sexo }}</td>
+      <td>{{ item.idade }}</td>
+    </tr>
+    } @empty {
+    <tr>
+      <td colspan="4">Sem registros</td>
+    </tr>
+    }
+  </tbody>
+</table>
+```
+
+**Estilo opcional (`lista.scss`)**
+
+```scss
+.linha-par {
+  background: rgba(0, 0, 0, 0.04);
+}
+```
+
+---
+
+> **Lembrete (v20)**: é comum ver arquivos com nomes mais curtos (ex.: `lista.ts`, `lista.html`, `lista.scss`) e tags sem conteúdo em forma **auto-fechada** (ex.: `<router-outlet />`).
