@@ -787,3 +787,218 @@ title = "titulo desejado";
 <!-- nome.html -->
 <input [(ngModel)]="title" />
 ```
+
+---
+
+---
+
+## Aula 10 — Diretivas de decisão com **control flow moderno**: `@if` e `@switch` (Angular v20)
+
+> Desde o Angular 17, o **novo control flow** (blocos `@if`, `@switch`, `@for`) substitui as diretivas estruturais antigas (`*ngIf`, `*ngSwitch`, `*ngFor`).  
+> No Angular 20, esse novo padrão é o **recomendado**. As diretivas antigas estão **deprecadas** e têm **remoção prevista** (indicada para v22).
+
+---
+
+### Por que usar `@if` / `@switch`?
+
+- **Sintaxe mais clara** (dispensa `ng-template` auxiliar para `else`).
+- **Melhor performance/diagnóstico** de templates.
+- **Composição simples**: aninhar `@if`/`@switch`, usar `@else if`, etc.
+
+---
+
+## 1. `@if` (com `@else` e `@else if`)
+
+- **`@if (condição) { … }**: renderiza o bloco **se** a condição for verdadeira.
+- **`@else { … }**: alternativa quando a condição for falsa.
+- **`@else if (outraCondição) { … }**: encadeia novas verificações sem criar vários níveis de aninhamento.
+
+**Exemplos**:
+
+```html
+@if (title) {
+<h1>{{ title }}</h1>
+} @else {
+<h1>mensagem caso title vazio</h1>
+}
+```
+
+```html
+@if (title === 'ok') {
+<p>Estado: OK</p>
+} @else if (title === 'erro') {
+<p>Estado: ERRO</p>
+} @else {
+<p>Estado: desconhecido</p>
+}
+```
+
+**Dicas**:
+
+- Variáveis auxiliares com `@let`:
+
+  ```html
+  @let trimmed = title?.trim(); @if (trimmed?.length) {
+  <h2>{{ trimmed }}</h2>
+  } @else {
+  <h2>Sem título</h2>
+  }
+  ```
+
+- `@if` aceita qualquer expressão booleana (ex.: `!!valor`).
+
+---
+
+### Antes (antigo `*ngIf`)
+
+- Dependia de `ng-template` para o ramo alternativo e era comum aninhar condições.
+
+```html
+<h1 *ngIf="title; else mensagemPadrao">{{ title }}</h1>
+<ng-template #mensagemPadrao>
+  <h1>mensagem caso title vazio</h1>
+</ng-template>
+```
+
+---
+
+## 2. `@switch` (com `@case` e `@default`)
+
+- **`@switch (expressão) { … }**: escolhe um bloco a partir do valor da expressão.
+- **`@case (valor) { … }**: ramo executado quando há **igualdade estrita** com a expressão.
+- **`@default { … }`**: caso padrão quando nenhum `@case` corresponde.
+
+**Exemplos**:
+
+```html
+@switch (title) { @case ('sim') {
+<p>Mensagem se SIM</p>
+} @case ('nao') {
+<p>Mensagem se NÃO</p>
+} @default {
+<p>Mensagem padrão</p>
+} }
+```
+
+**Dicas**:
+
+- `@case` usa comparação **estrita**; cuide dos tipos (ex.: `'true'` ≠ `true`).
+- Exemplo com booleanos:
+
+  ```html
+  @switch (isValid) { @case (true) {
+  <p>Válido</p>
+  } @case (false) {
+  <p>Inválido</p>
+  } @default {
+  <p>Indeterminado</p>
+  } }
+  ```
+
+### Antes (antigo `*ngSwitch`)
+
+```html
+<span [ngSwitch]="title">
+  <p *ngSwitchCase="'sim'">Mensagem se SIM</p>
+  <p *ngSwitchCase="'nao'">Mensagem se NÃO</p>
+  <p *ngSwitchDefault>Mensagem padrão</p>
+</span>
+```
+
+---
+
+## 3. Exemplos “1:1” (mapeando do antigo para o novo)
+
+### `*ngIf` + `else` → `@if` + `@else`
+
+```html
+<!-- Antigo -->
+<h1 *ngIf="title; else vazio">{{ title }}</h1>
+<ng-template #vazio><h1>Sem título</h1></ng-template>
+
+<!-- Novo -->
+@if (title) {
+<h1>{{ title }}</h1>
+} @else {
+<h1>Sem título</h1>
+}
+```
+
+### `*ngSwitchCase` / `*ngSwitchDefault` → `@case` / `@default`
+
+```html
+<!-- Antigo -->
+<div [ngSwitch]="status">
+  <p *ngSwitchCase="'loading'">Carregando…</p>
+  <p *ngSwitchCase="'ready'">Pronto!</p>
+  <p *ngSwitchDefault>Desconhecido</p>
+</div>
+
+<!-- Novo -->
+@switch (status) { @case ('loading') {
+<p>Carregando…</p>
+} @case ('ready') {
+<p>Pronto!</p>
+} @default {
+<p>Desconhecido</p>
+} }
+```
+
+---
+
+## 4. Boas práticas
+
+- **Prefira o novo control flow** (`@if`, `@switch`) em código novo e durante migrações.
+- Evite **lógica pesada** no template; pré-compute no componente ou use **Signals**.
+- Seja **explícito em tipos** no `@switch` para evitar armadilhas de comparação.
+
+---
+
+## 5. Erros comuns (e como evitar)
+
+- Esquecer **chaves/blocos**: `@if (...) { … } @else { … }`.
+- **Misturar** antigo e novo no mesmo trecho sem necessidade.
+- Usar `@case` com **tipo diferente** do valor comparado.
+
+---
+
+## 6. Exemplo completo (componente simples)
+
+**Template (`app.html`)**:
+
+```html
+<input [(ngModel)]="title" placeholder="Digite um título" />
+
+@if (title) {
+<h2>{{ title }}</h2>
+} @else {
+<h2>Informe um título</h2>
+} @switch (title?.toLowerCase()) { @case ('sim') {
+<p>Você digitou SIM</p>
+} @case ('não') {
+<p>Você digitou NÃO</p>
+} @default {
+<p>Outro valor</p>
+} }
+```
+
+**Classe (`app.ts`)**:
+
+```ts
+import { Component } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+
+@Component({
+  selector: "app-root",
+  standalone: true, // no v20 standalone é padrão; alguns schematics podem omitir
+  templateUrl: "./app.html",
+  imports: [FormsModule],
+})
+export class AppComponent {
+  title = "";
+}
+```
+
+> **Lembrete**: Na **v20** é comum ver arquivos com nomes mais curtos (ex.: `app.ts`, `app.html`, `app.scss`) e tags sem conteúdo em forma **auto-fechada** (ex.: `<router-outlet />`).
+
+---
