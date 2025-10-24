@@ -435,7 +435,7 @@ onSelected(name: string) {
 
 ### Exemplos práticos
 
-**1) `OnInit` + `OnChanges` com `@Input()`**
+**1. `OnInit` + `OnChanges` com `@Input()`**
 
 ```ts
 import {
@@ -468,7 +468,7 @@ export class UserCardComponent implements OnInit, OnChanges {
 }
 ```
 
-**2) Content vs View (`AfterContentInit` e `AfterViewInit`)**
+**2. Content vs View (`AfterContentInit` e `AfterViewInit`)**
 
 ```ts
 import {
@@ -505,7 +505,7 @@ export class PanelComponent implements AfterContentInit, AfterViewInit {
 }
 ```
 
-**3) `DoCheck` (evite, a menos que precise)**
+**3. `DoCheck` (evite, a menos que precise)**
 
 ```ts
 import { DoCheck } from "@angular/core";
@@ -600,7 +600,7 @@ export class UsersComponent implements OnInit {
 
 ---
 
-## 1) Interpolação
+## 1. Interpolação
 
 - **Direção**: **somente leitura** da classe para o HTML.
 - **Uso típico**: texto, atributos que aceitam _string_ no conteúdo (ex.: dentro de tags).
@@ -608,13 +608,13 @@ export class UsersComponent implements OnInit {
 **Exemplo**:
 
 ```ts
-// nome.ts
+// .ts
 title = "Título desejado";
 user = { name: "Ana", score: 42 };
 ```
 
 ```html
-<!-- nome.html -->
+<!-- .html -->
 <h1>{{ title }}</h1>
 <p>Usuário: {{ user.name }} — Pontos: {{ user.score }}</p>
 ```
@@ -634,13 +634,13 @@ user = { name: "Ana", score: 42 };
 **Exemplo**:
 
 ```ts
-// nome.ts
+// .ts
 imgURL = "https://exemplo.com/imagem.png";
 isDisabled = true;
 ```
 
 ```html
-<!-- nome.html -->
+<!-- .html -->
 
 <img [src]="imgURL" alt="Imagem" />
 <button [disabled]="isDisabled">Enviar</button>
@@ -653,7 +653,7 @@ isDisabled = true;
 
 ---
 
-## 3) Event Binding
+## 3. Event Binding
 
 - **Direção**: template → classe (o template **emite** um evento para o TS reagir).
 - **Uso típico**: cliques, teclas, mudanças de valor, eventos custom de componentes.
@@ -661,14 +661,14 @@ isDisabled = true;
 **Exemplo**:
 
 ```ts
-// nome.ts
+// .ts
 chamarFuncao() {
 // ação a executar quando o botão for clicado
 }
 ```
 
 ```html
-<!-- nome.html -->
+<!-- .html -->
 
 <button (click)="chamarFuncao()">Acionar</button>
 ```
@@ -680,7 +680,7 @@ chamarFuncao() {
 
 ---
 
-## 4) Two-Way Data Binding (Template-driven)
+## 4. Two-Way Data Binding (Template-driven)
 
 - **Direção**: **mão dupla** (classe ↔ template).
 - **Requisito**: **FormsModule**. Em projetos **standalone**, importe no **componente** (ou em providers via `importProvidersFrom`).
@@ -688,7 +688,7 @@ chamarFuncao() {
 **Exemplo (standalone component)**:
 
 ```ts
-// nome.ts
+// .ts
 import { Component } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 
@@ -704,7 +704,7 @@ export class NomeComponent {
 ```
 
 ```html
-<!-- nome.html -->
+<!-- .html -->
 
 <input [(ngModel)]="title" placeholder="Digite o título" />
 
@@ -738,53 +738,53 @@ export class NomeComponent {
 
 ## Exemplos resumidos
 
-**1) Interpolação**:
+**1. Interpolação**:
 
 ```ts
-// nome.ts
+// .ts
 title = "titulo desejado";
 ```
 
 ```html
-<!-- nome.html -->
+<!-- .html -->
 <h1>{{ title }}</h1>
 ```
 
-**2) Property binding**:
+**2. Property binding**:
 
 ```ts
-// nome.ts
+// .ts
 imgURL = "link/endereco-da-imagem";
 ```
 
 ```html
-<!-- nome.html -->
+<!-- .html -->
 <img [src]="imgURL" />
 ```
 
-**3) Event binding**:
+**3. Event binding**:
 
 ```ts
-// nome.ts
+// .ts
 chamarFuncao() {}
 ```
 
 ```html
-<!-- nome.html -->
+<!-- .html -->
 <button (click)="chamarFuncao()">Clique</button>
 ```
 
-**4) Two-way data binding**:
+**4. Two-way data binding**:
 
 ```ts
-// nome.ts (standalone)
+// .ts (standalone)
 import { FormsModule } from "@angular/forms";
 imports: [FormsModule];
 title = "titulo desejado";
 ```
 
 ```html
-<!-- nome.html -->
+<!-- .html -->
 <input [(ngModel)]="title" />
 ```
 
@@ -907,7 +907,7 @@ title = "titulo desejado";
 
 ---
 
-## 3. Exemplos “1:1” (mapeando do antigo para o novo)
+## 3. Exemplos “1:1” (mapeando do antigo para o novo) [Aula 10]
 
 ### `*ngIf` + `else` → `@if` + `@else`
 
@@ -946,7 +946,7 @@ title = "titulo desejado";
 
 ---
 
-## 4. Boas práticas
+## 4. Boas práticas [Aula 10]
 
 - **Prefira o novo control flow** (`@if`, `@switch`) em código novo e durante migrações.
 - Evite **lógica pesada** no template; pré-compute no componente ou use **Signals**.
@@ -954,7 +954,7 @@ title = "titulo desejado";
 
 ---
 
-## 5. Erros comuns (e como evitar)
+## 5. Erros comuns (e como evitar) [Aula 10]
 
 - Esquecer **chaves/blocos**: `@if (...) { … } @else { … }`.
 - **Misturar** antigo e novo no mesmo trecho sem necessidade.
@@ -962,7 +962,7 @@ title = "titulo desejado";
 
 ---
 
-## 6. Exemplo completo (componente simples)
+## 6. Exemplo completo (componente simples) [Aula 10]
 
 **Template (`app.html`)**:
 
@@ -1005,7 +1005,7 @@ export class AppComponent {
 
 ---
 
-## Aula 11 — Diretivas estruturais: `@for` (Angular v20)
+## Aula 11 — Diretivas estruturais: `@for`
 
 > Desde o Angular 17, o **novo control flow** (blocos `@if`, `@switch`, `@for`) substitui as diretivas estruturais antigas (`*ngIf`, `*ngSwitch`, `*ngFor`).  
 > No Angular 20, esse novo padrão é o **recomendado**. As diretivas antigas estão **deprecadas** e têm **remoção prevista** (indicada para v22).
@@ -1088,7 +1088,7 @@ export class AppComponent {
 
 ---
 
-## 3. Exemplos “1:1” (mapeando do antigo para o novo)
+## 3. Exemplos “1:1” (mapeando do antigo para o novo) [Aula 11]
 
 **Antigo → Novo (com vazio e track)**:
 
@@ -1135,7 +1135,7 @@ export class AppComponent {
 
 ---
 
-## 4. Boas práticas
+## 4. Boas práticas [Aula 11]
 
 - **Rastreie** com `track item.id` (ou outra chave única) para melhor desempenho.
 - **Evite funções no template** (ex.: `calculaAlgo(item)`): compute no TS, use **Signals** ou getters baratos.
@@ -1144,7 +1144,7 @@ export class AppComponent {
 
 ---
 
-## 5. Erros comuns (e como evitar)
+## 5. Erros comuns (e como evitar) [Aula 11]
 
 - **Esquecer o `@empty`** e renderizar tabela vazia sem feedback.
 - **Rastreamento instável** (`track index`) → elementos piscando/re-montando; prefira uma chave **estável**.
@@ -1152,7 +1152,7 @@ export class AppComponent {
 
 ---
 
-## 6. Exemplo completo (componente simples)
+## 6. Exemplo completo (componente simples) [Aula 11]
 
 **Classe (`lista.ts`)**:
 
