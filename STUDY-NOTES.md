@@ -115,7 +115,7 @@ ng new <nome-do-app>
 > - Se escolher outra: a CLI cria arquivos/configs de boas práticas da ferramenta.
 
 **Rodando o projeto**
-A opção **`-o`** (`--open`) abre o navegador automaticamente em `http://localhost:4200` ao terminar a compilação.  
+A opção **`-o`** (`--open`) abre o navegador automaticamente em `http://localhost:4200` ao terminar a compilação.
 Sem **`-o`**, abra manualmente: `http://localhost:4200`.
 
 ```bash
@@ -224,7 +224,7 @@ node -v && npm -v
 
 ---
 
-## Execuções realizadas
+### Execuções realizadas
 
 - Conferi a versão do Angular CLI instalado com `ng version`.
 - Criei projeto com `ng new <nome-do-app>` (ajuste o nome conforme seu caso) e rodei `ng serve -o` para validar o ambiente.
@@ -236,30 +236,102 @@ node -v && npm -v
 ## Aula 07 — O que são **Componentes** no Angular
 
 > **Definição**: componente é a **unidade básica de UI** no Angular.  
-> Junta **lógica** (classe TypeScript), **template** (HTML), **estilos** (CSS/SCSS) e **metadados** (decorator `@Component`).  
-> Em apps modernas (v20), os componentes são **standalone por padrão** e se conectam via **Inputs/Outputs**, **rotas** e **serviços**.
+> Junta **lógica** (classe TypeScript), **template** (HTML), **estilos** (CSS/SCSS) e **metadados** (decorator @Component).  
+> No Angular moderno (v20), componentes são **standalone por padrão** e se conectam via **Inputs/Outputs**, **rotas** e **serviços**.
 
-Ou seja: **Componente = unidade de UI** com TS + HTML + estilos (opcionalmente + testes).
-
----
+Ou seja: **Componente = unidade de UI** com TS + HTML + estilos (e, opcionalmente, testes).
 
 ---
 
-## Aula 07 - [EXTRA] Pesquisa pessoal
+### Como gerar um componente?
 
-O curso cujo este repositório acompanha foi gravado com Angular **v19**.
-Contudo, este repositório usa a versão mais moderna do Angular atualmente, o **Angular 20**
+O **Angular CLI** gera os artefatos do projeto. Para componentes:
 
-Depois de perceber a mudança na **nomenclatura** dos arquivos gerados pela CLI, descobri também que **Zoneless** agora é opcional e resolvi escrever algumas considerações sobre o Angular 20.
+```bash
+ng generate component <nome>
+```
 
-### Mudanças no Angular 20
+Atalho equivalente:
 
-- **Arquivos com nomes mais simples**
+```bash
+ng g c <nome>
+```
 
-  - **Atual**: o CLI não adiciona mais os sufixos `.component`, `.service`, `.directive` (exemplos de arquivos gerados: **`home.ts`**, **`home.html`**, **`home.scss`**).
-  - **Antigo**: **`home.component.ts`**, **`home.component.html`**, **`home.component.scss`**.
+> **Importante**: `<nome>` na verdade representa um **caminho**, onde barras "**/**" separam pasta de subpastas. E o **último segmento** define **(a)** a **pasta final** criada, **(b)** o **seletor** (prefixado, ex.: `app-`), e **(c)** o **nome da classe** em **PascalCase**.  
+> Ex.: `components/nome-do-componente` → classe `NomeDoComponente`, seletor `app-nome-do-componente`.
 
-> Porém, alguns geradores continuam incluindo o tipo no nome do arquivo, só que com hífen (não mais com ponto):
+#### O que é gerado
+
+Comando:
+
+```bash
+ng g c components/nome-desejado
+```
+
+Estrutura criada (padrão v20):
+
+```text
+src/
+└─ app/
+   └─ components/
+      └─ nome-desejado/
+         ├─ nome-desejado.html
+         ├─ nome-desejado.scss
+         ├─ nome-desejado.spec.ts
+         └─ nome-desejado.ts
+```
+
+Arquivo principal do componente:
+
+```ts
+// src/app/components/nome-desejado/nome-desejado.ts
+import { Component } from "@angular/core";
+
+@Component({
+  //     seletor 👇🏻 = prefixo (p.ex. "app-") + último segmento do caminho
+  selector: "app-nome-desejado",
+  imports: [], // dependências que o template usa (diretivas, pipes, outros componentes)
+  templateUrl: "./nome-desejado.html",
+  styleUrl: "./nome-desejado.scss", // v20 costuma gerar "styleUrl" (singular)
+})
+export class NomeDesejado {}
+// nome da classe 👆🏻 = último segmento em PascalCase, sem hífens
+```
+
+**Opções úteis (podem ser combinadas):**
+
+- `--style=scss` → cria arquivo de estilo em SCSS
+- `--skip-tests` → não cria o arquivo de testes `.spec.ts`
+- `--selector=app-meu-card` → define um seletor específico
+- `--inline-template` / `--inline-style` → usa `template`/`styles` em linha
+- `--flat` → coloca os arquivos no diretório alvo **sem** criar uma pasta própria
+- `--prefix=app` → altera o prefixo do seletor para este componente
+
+> **Dica**: em apps standalone, tudo que o template usa deve aparecer em `imports` (ex.: `RouterOutlet`, componentes filhos, diretivas/pipes).
+
+---
+
+### Usando o componente
+
+No template de outro componente (ex.: `app.html`):
+
+```html
+<app-nome-desejado />
+```
+
+Para mudar o seletor, gere com `--selector` **ou** edite o campo `selector` no decorator @Component.
+
+---
+
+> **AVISO IMPORTANTE!!!**
+>
+> No Angular 20, o CLI simplificou simplificou a convenção de nomes de arquivos, passando a gerar **nome curtos**, sem os sufixos no meio.
+>
+> Ex.: `home.ts`, `home.html`, `home.scss` (em vez de `home.component.ts/html/scss`).
+>
+> Os nome curtos valem para os componentes (`.components`), serviço (`.serviço`) e diretiva (`.iretiva`).
+>
+> Porém os geradores de outros artefatos mantêm o sufixo tipo no nome do arquivo, só que com **hífen** (não mais com ponto):
 >
 > - Guards → `auth-guard.ts`
 > - Interceptors → `logging-interceptor.ts`
@@ -267,109 +339,14 @@ Depois de perceber a mudança na **nomenclatura** dos arquivos gerados pela CLI,
 > - Modules → `shared-module.ts`
 > - Pipes → `currency-pipe.ts`
 
-- **Zoneless opcional**
-  - **Atual**: já é possível criar o projeto **sem Zone.js** (detecção de mudanças guiada por **Signals**).
-  - **Antigo**: Zone.js vinha habilitado por padrão e quase onipresente.
-
-> **Resumo:** Angular incentiva **standalone components** + **Signals** para reatividade **mais explícita e performática**.
-
 ---
 
-### Anatomia de um componente (v20, standalone)
+### Boas práticas rápidas
 
-- **Classe TS** com `@Component` (define `selector`, `templateUrl`/`styles` e **`imports`** para dependências de template).
-- **Template HTML** (marcação + bindings).
-- **Estilos** (scoped ao componente).
-- **Inputs/Outputs** para comunicação com pais/filhos.
-
-**Exemplo mínimo (app raiz)**:
-
-```ts
-// app.ts (standalone por padrão)
-import { Component } from "@angular/core";
-import { RouterOutlet } from "@angular/router";
-
-@Component({
-  selector: "app-root",
-  templateUrl: "./app.html",
-  styleUrls: ["./app.scss"],
-  imports: [RouterOutlet], // dependências usadas no template
-})
-export class AppComponent {
-  title = "Minha App";
-}
-```
-
-```html
-<!-- app.html -->
-<h1>{{ title }}</h1>
-<router-outlet />
-```
-
-> **Antigo (para comparar)**: `AppModule` com `declarations/imports` e `app.component.ts` contendo `standalone: true` (ou nem standalone, dependendo da versão).
-
----
-
-### Componente de feature (Inputs/Outputs + uso em template)
-
-**Definição**:
-
-```ts
-// product.ts
-import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { CommonModule } from "@angular/common";
-
-@Component({
-  selector: "app-product",
-  templateUrl: "./product.html",
-  styleUrls: ["./product.scss"],
-  imports: [CommonModule], // ex.:  @for/@if (*ngFor, *ngIf em versões anteriores)
-})
-export class ProductComponent {
-  @Input() name = "";
-  @Output() selected = new EventEmitter<string>();
-
-  select() {
-    this.selected.emit(this.name);
-  }
-}
-```
-
-```html
-<!-- product.html -->
-<div class="card">
-  <p>{{ name }}</p>
-  <button (click)="select()">Selecionar</button>
-</div>
-```
-
-**Uso em outro componente**:
-
-```html
-<!-- app.html (trecho) -->
-
-<app-product
-  [name]="'Notebook X'"
-  (selected)="onSelected($event)"
-></app-product>
-```
-
-```ts
-// app.ts (trecho)
-onSelected(name: string) {
-// reagir à escolha do produto
-}
-```
-
----
-
-### Boas práticas (v20)
-
-- **Imports explícitos no componente**: tudo que o template usa deve estar em **`imports`** (ex.: `RouterOutlet`, diretivas, outros componentes).
-- **Separação de responsabilidades**: lógica em **serviços**, UI em **componentes**.
-- **Reatividade moderna**: considere **Signals** para estado local previsível e rápido.
-- **Adoção gradual**: se herdar código com **NgModules**, é possível **conviver** e migrar quando fizer sentido.
-- **Kebab-case consistente**: nomes de arquivo e selectors com hífen (`user-profile.ts`, `app-user-card`); mantenha mesmo nome base entre `.ts/.html/.css/.spec`.
+- **Kebab-case consistente**: mantenha o mesmo nome base entre `.ts`/`.html`/`.scss`/`.spec.ts`.
+- **Uma responsabilidade por componente**: UI e lógica de apresentação; mova regra de negócio para **services**.
+- **Imports explícitos**: adicione em `imports` tudo que o template requer.
+- **Padrões modernos**: use o **control flow** novo (`@if`, `@for`, `@switch`) e **Signals** quando precisar de estado local reativo e previsível.
 
 ---
 
@@ -406,7 +383,7 @@ onSelected(name: string) {
   Injete dependências e inicialize **estado leve**. **Não** acesse o DOM nem dados de `@Input()` (ainda não foram setados).
 
 - **`ngOnInit()`** (`implements OnInit`)
-  Componente está pronto para iniciar lógica inicial.  
+  Componente está pronto para iniciar lógica inicial.
   **Use para**: carregar dados iniciais, configurar _subscriptions_ (com limpeza planejada), iniciar timers/efeitos.
 
 - **`ngOnChanges(changes)`** (`implements OnChanges`)
@@ -549,7 +526,7 @@ export class UsersComponent implements OnInit {
 }
 ```
 
-> Regra de bolso: **“Abri? Tenho que fechar.”**  
+> Regra de bolso: **“Abri? Tenho que fechar.”**
 > Subscriptions, timers, websockets, observers de DOM… limpe tudo no `ngOnDestroy()` _(ou usando utilitários que limpam por você)_.
 
 ---
@@ -579,7 +556,7 @@ export class UsersComponent implements OnInit {
 
 ## Aula 09 — Tipos de Data Binding no Angular
 
-> **Ideia central**: _binding_ é a forma de **sincronizar dados** entre **classe (TypeScript)** e **template (HTML)**.  
+> **Ideia central**: _binding_ é a forma de **sincronizar dados** entre **classe (TypeScript)** e **template (HTML)**.
 > No Angular temos **4 formas** principais:
 >
 > - **interpolação**,
@@ -600,7 +577,7 @@ export class UsersComponent implements OnInit {
 
 ---
 
-## 1. Interpolação
+### 1. Interpolação
 
 - **Direção**: **somente leitura** da classe para o HTML.
 - **Uso típico**: texto, atributos que aceitam _string_ no conteúdo (ex.: dentro de tags).
@@ -626,7 +603,7 @@ user = { name: "Ana", score: 42 };
 
 ---
 
-## 2) Property Binding
+### 2. Property Binding
 
 - **Direção**: classe → template, **em propriedades reais** do elemento/Componente/Directiva (não apenas atributos HTML).
 - **Vantagem**: trabalha com **tipos** e recursos do DOM/Componentes (ex.: `[disabled]`, `[value]`, `[src]`, `[ngClass]`).
@@ -653,7 +630,7 @@ isDisabled = true;
 
 ---
 
-## 3. Event Binding
+### 3. Event Binding
 
 - **Direção**: template → classe (o template **emite** um evento para o TS reagir).
 - **Uso típico**: cliques, teclas, mudanças de valor, eventos custom de componentes.
@@ -680,7 +657,7 @@ chamarFuncao() {
 
 ---
 
-## 4. Two-Way Data Binding (Template-driven)
+### 4. Two-Way Data Binding (Template-driven)
 
 - **Direção**: **mão dupla** (classe ↔ template).
 - **Requisito**: **FormsModule**. Em projetos **standalone**, importe no **componente** (ou em providers via `importProvidersFrom`).
@@ -719,7 +696,7 @@ export class NomeComponent {
 
 ---
 
-## Escolhas e equivalências úteis
+### Escolhas e equivalências úteis
 
 - `[value]="prop"` + `(input)="prop = $event.target.value"` **≈** `[(ngModel)]="prop"` (mas `ngModel` exige **FormsModule**).
 - `[src]` **vs** atributo `src`: o binding usa **propriedade** do elemento (aplica tipos/validação do DOM).
@@ -727,7 +704,7 @@ export class NomeComponent {
 
 ---
 
-## Erros comuns (e como evitar) [Aula 09]
+### Erros comuns (e como evitar) [Aula 09]
 
 - **Esquecer de importar FormsModule** → `[(ngModel)]` não funciona.
 - **Funções caras** em interpolação/bindings → _jank_ de performance (prefira getters/sinais ou pré-computar).
@@ -736,7 +713,7 @@ export class NomeComponent {
 
 ---
 
-## Exemplos resumidos
+### Exemplos resumidos
 
 **1. Interpolação**:
 
@@ -794,7 +771,7 @@ title = "titulo desejado";
 
 ## Aula 10 — Diretivas de decisão `@if` e `@switch`
 
-> Desde o Angular 17, o **novo control flow** (blocos `@if`, `@switch`, `@for`) substitui as diretivas estruturais antigas (`*ngIf`, `*ngSwitch`, `*ngFor`).  
+> Desde o Angular 17, o **novo control flow** (blocos `@if`, `@switch`, `@for`) substitui as diretivas estruturais antigas (`*ngIf`, `*ngSwitch`, `*ngFor`).
 > No Angular 20, esse novo padrão é o **recomendado**. As diretivas antigas estão **deprecadas** e têm **remoção prevista** (indicada para v22).
 
 ---
@@ -807,7 +784,7 @@ title = "titulo desejado";
 
 ---
 
-## 1. `@if` (com `@else` e `@else if`)
+### 1. `@if` (com `@else` e `@else if`)
 
 - **`@if (condição) { … }`**: renderiza o bloco **se** a condição for verdadeira.
 - **`@else { … }`**: alternativa quando a condição for falsa.
@@ -849,7 +826,7 @@ title = "titulo desejado";
 
 ---
 
-### Antes (antigo `*ngIf`)
+#### Antes (antigo `*ngIf`)
 
 - Dependia de `ng-template` para o ramo alternativo e era comum aninhar condições.
 
@@ -862,7 +839,7 @@ title = "titulo desejado";
 
 ---
 
-## 2. `@switch` (com `@case` e `@default`)
+### 2. `@switch` (com `@case` e `@default`)
 
 - **`@switch (expressão) { … }`**: escolhe um bloco a partir do valor da expressão.
 - **`@case (valor) { … }`**: ramo executado quando há **igualdade estrita** com a expressão.
@@ -895,7 +872,7 @@ title = "titulo desejado";
   } }
   ```
 
-### Antes (antigo `*ngSwitch`)
+#### Antes (antigo `*ngSwitch`)
 
 ```html
 <span [ngSwitch]="title">
@@ -907,9 +884,9 @@ title = "titulo desejado";
 
 ---
 
-## 3. Exemplos “1:1” (mapeando do antigo para o novo) [Aula 10]
+### 3. Exemplos “1:1” (mapeando do antigo para o novo) [Aula 10]
 
-### `*ngIf` + `else` → `@if` + `@else`
+#### `*ngIf` + `else` → `@if` + `@else`
 
 ```html
 <!-- Antigo -->
@@ -924,7 +901,7 @@ title = "titulo desejado";
 }
 ```
 
-### `*ngSwitchCase` / `*ngSwitchDefault` → `@case` / `@default`
+#### `*ngSwitchCase` / `*ngSwitchDefault` → `@case` / `@default`
 
 ```html
 <!-- Antigo -->
@@ -946,7 +923,7 @@ title = "titulo desejado";
 
 ---
 
-## 4. Boas práticas [Aula 10]
+### 4. Boas práticas [Aula 10]
 
 - **Prefira o novo control flow** (`@if`, `@switch`) em código novo e durante migrações.
 - Evite **lógica pesada** no template; pré-compute no componente ou use **Signals**.
@@ -954,7 +931,7 @@ title = "titulo desejado";
 
 ---
 
-## 5. Erros comuns (e como evitar) [Aula 10]
+### 5. Erros comuns (e como evitar) [Aula 10]
 
 - Esquecer **chaves/blocos**: `@if (...) { … } @else { … }`.
 - **Misturar** antigo e novo no mesmo trecho sem necessidade.
@@ -962,7 +939,7 @@ title = "titulo desejado";
 
 ---
 
-## 6. Exemplo completo (componente simples) [Aula 10]
+### 6. Exemplo completo (componente simples) [Aula 10]
 
 **Template (`app.html`)**:
 
@@ -1007,7 +984,7 @@ export class AppComponent {
 
 ## Aula 11 — Diretivas estruturais: `@for`
 
-> Desde o Angular 17, o **novo control flow** (blocos `@if`, `@switch`, `@for`) substitui as diretivas estruturais antigas (`*ngIf`, `*ngSwitch`, `*ngFor`).  
+> Desde o Angular 17, o **novo control flow** (blocos `@if`, `@switch`, `@for`) substitui as diretivas estruturais antigas (`*ngIf`, `*ngSwitch`, `*ngFor`).
 > No Angular 20, esse novo padrão é o **recomendado**. As diretivas antigas estão **deprecadas** e têm **remoção prevista** (indicada para v22).
 
 ---
@@ -1024,7 +1001,7 @@ export class AppComponent {
 
 ---
 
-## 1. `@for` (com `@empty` e `track`)
+### 1. `@for` (com `@empty` e `track`)
 
 **Explicações**:
 
@@ -1074,7 +1051,7 @@ export class AppComponent {
 
 ---
 
-### Antes (antigo `*ngFor`)
+#### Antes (antigo `*ngFor`)
 
 - Exigia atributo estrutural e, para tratar vazio, era comum usar `*ngIf` ou `ng-template`.
 
@@ -1088,7 +1065,7 @@ export class AppComponent {
 
 ---
 
-## 3. Exemplos “1:1” (mapeando do antigo para o novo) [Aula 11]
+### 3. Exemplos “1:1” (mapeando do antigo para o novo) [Aula 11]
 
 **Antigo → Novo (com vazio e track)**:
 
@@ -1135,7 +1112,7 @@ export class AppComponent {
 
 ---
 
-## 4. Boas práticas [Aula 11]
+### 4. Boas práticas [Aula 11]
 
 - **Rastreie** com `track item.id` (ou outra chave única) para melhor desempenho.
 - **Evite funções no template** (ex.: `calculaAlgo(item)`): compute no TS, use **Signals** ou getters baratos.
@@ -1144,7 +1121,7 @@ export class AppComponent {
 
 ---
 
-## 5. Erros comuns (e como evitar) [Aula 11]
+### 5. Erros comuns (e como evitar) [Aula 11]
 
 - **Esquecer o `@empty`** e renderizar tabela vazia sem feedback.
 - **Rastreamento instável** (`track index`) → elementos piscando/re-montando; prefira uma chave **estável**.
@@ -1152,7 +1129,7 @@ export class AppComponent {
 
 ---
 
-## 6. Exemplo completo (componente simples) [Aula 11]
+### 6. Exemplo completo (componente simples) [Aula 11]
 
 **Classe (`lista.ts`)**:
 
