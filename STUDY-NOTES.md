@@ -251,13 +251,13 @@ O **Angular CLI** gera os artefatos do projeto. Para componentes:
 ng generate component <nome>
 ```
 
-Atalho equivalente:
+Comando reduzido:
 
 ```bash
 ng g c <nome>
 ```
 
-> **Importante**: `<nome>` na verdade representa um **caminho**, onde barras "**/**" separam pasta de subpastas. E o **último segmento** define **(a)** a **pasta final** criada, **(b)** o **seletor** (prefixado, ex.: `app-`), e **(c)** o **nome da classe** em **PascalCase**.  
+> **Importante**: `<nome>` na verdade representa um **caminho**, onde barras "`/`" separam pasta e subpastas. O **último segmento** define **(a)** a **pasta final** criada, **(b)** o **seletor** (prefixado, ex.: `app-`), e **(c)** o **nome da classe** em **PascalCase**.  
 > Ex.: `components/nome-do-componente` → classe `NomeDoComponente`, seletor `app-nome-do-componente`.
 
 #### O que é gerado
@@ -1202,3 +1202,194 @@ export class ListaComponent {
 ---
 
 > **Lembrete (v20)**: é comum ver arquivos com nomes mais curtos (ex.: `lista.ts`, `lista.html`, `lista.scss`) e tags sem conteúdo em forma **auto-fechada** (ex.: `<router-outlet />`).
+
+---
+
+---
+
+## Aula 13 — Criando **Pipes customizadas**
+
+> **Pipes** permitem aplicar transformações de exibição diretamente no **template**, sem alterar o dado original.
+
+---
+
+### Por que criar uma pipe customizada?
+
+- **Reuso de formatações** específicas do seu domínio (ex.: normalizar sexo, CEP, CPF, CNPJ, telefone).
+- **Separação de responsabilidades**: o componente fica limpo; a transformação fica encapsulada.
+- **Testabilidade**: lógica de transformação isolada em uma classe pequena e fácil de testar.
+
+---
+
+## 1. Como gerar uma pipe
+
+**Comando:**
+
+```bash
+ng generate pipe <nome>
+```
+
+Comando reduzido:
+
+```bash
+ng g p <nome>
+```
+
+> **Importante**: `<nome>` na verdade representa um **caminho**, onde barras "`/`" separam pasta e subpastas. O **último segmento** define **(a)** a **pasta final** criada, **(b)** o `name` **do pipe** (propriedade do decorator `@Pipe`), e **(c)** o **nome da classe** em **PascalCase** (convencionalmente terminando em **Pipe**).  
+> Ex.: `pipe/nome-do-pipe` → classe `NomeDoPipe`, name `nomeDoPipe`.
+
+- **Opicionalmente**, pode adicionar "`--skip-tests`" no fim do comando gerador para não criar o arquivo de teste.
+
+---
+
+## 2. Exemplo: pipe `sexo`
+
+Objetivo: exibir **Masculino** ou **Feminino** a partir de valores curtos (`m`/`f`) ou variações.
+
+**Gerando:**
+
+```bash
+ng g p pipes/sexo
+```
+
+**Implementação (`pipes/sexo-pipe.ts`):**
+
+```ts
+import { Pipe, PipeTransform } from "@angular/core";
+
+@Pipe({
+  name: "sexo",
+})
+export class SexoPipe implements PipeTransform {
+  transform(value: unknown): string {
+    if (value == null) return "Não informado";
+
+    const v = String(value).trim().toLowerCase();
+    // aceita várias formas de entrada
+    if (v === "f" || v === "feminino" || v === "fem") return "Feminino";
+    if (v === "m" || v === "masculino" || v === "masc") return "Masculino";
+
+    // fallback: mantém original capitalizado
+    return (
+      v.charAt(0).toLocaleUpperCase("pt-BR") +
+      v.slice(1).toLocaleLowerCase("pt-BR")
+    );
+  }
+}
+```
+
+**Usando em um componente (`lista.ts`):**
+
+```ts
+import { Component } from "@angular/core";
+import { SexoPipe } from "./pipes/sexo.pipe";
+
+@Component({
+  selector: "app-lista",
+  standalone: true,
+  imports: [SexoPipe], // importa a pipe standalone
+  templateUrl: "./lista.html",
+})
+export class ListaComponent {
+  baseDeDados = [
+    { nome: "nome1", sexo: "f", idade: 20, salario: 5500 },
+    { nome: "nome2", sexo: "m", idade: 37, salario: 2980 },
+  ];
+}
+```
+
+**Template (`lista.html`):**
+
+```html
+<table>
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Sexo</th>
+      <th>Idade</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (item of baseDeDados; track item.nome) {
+    <tr>
+      <td>{{ item.nome }}</td>
+      <td>{{ item.sexo | sexo }}</td>
+      <td>{{ item.idade }}</td>
+    </tr>
+    } @empty {
+    <tr>
+      <td colspan="3">Sem registros</td>
+    </tr>
+    }
+  </tbody>
+</table>
+```
+
+---
+
+## 3. Boas práticas
+
+- **Control flow moderno**: combine com `@for`/`@if`/`@switch` para escrever templates mais claros.
+- **Pure vs Impure**: mantenha `pure: true`. Só use `pure: false` quando realmente precisar reagir a **mudanças internas** de objetos/arrays **sem trocar a referência** (custa performance).
+- **Null-safety**: trate `null`/`undefined` e valores inesperados; exiba um **fallback** amigável.
+- **Nomes claros**: o `name` da pipe deve refletir o que ela faz (ex.: `cpf`, `telefone`, `sexo`).
+- **Testes**: mantenha casos cobrindo entradas válidas, inválidas e bordas (vazio, nulo, maiúsculas/minúsculas).
+
+---
+
+## 4. Erros comuns (e como evitar)
+
+- **Esquecer de importar a pipe standalone** no componente → adicione em `imports: [MinhaPipe]`.
+- **Marcar impura sem necessidade** → pipes impuras executam com alta frequência; evite.
+- **Lógica pesada** dentro da pipe → mova para serviços/precompute; pipe deve ser leve.
+- **Alterar o dado original** dentro da pipe → pipe deve **somente formatar/transformar para exibição**.
+
+---
+
+## 5. Exemplo completo (variação com opções)
+
+Suponha que você queira exibir abreviação (`M`/`F`) quando houver a opção `short: true`.
+
+**Pipe (`sexo.pipe.ts`):**
+
+```ts
+import { Pipe, PipeTransform } from "@angular/core";
+
+@Pipe({ name: "sexo", standalone: true, pure: true })
+export class SexoPipe implements PipeTransform {
+  transform(value: unknown, options?: { short?: boolean }): string {
+    const v = String(value ?? "")
+      .trim()
+      .toLowerCase();
+    const isF = v === "f" || v === "fem" || v === "feminino";
+    const isM = v === "m" || v === "masc" || v === "masculino";
+
+    if (options?.short) {
+      if (isF) return "F";
+      if (isM) return "M";
+      return "";
+    } else {
+      if (isF) return "Feminino";
+      if (isM) return "Masculino";
+      return "Não informado";
+    }
+  }
+}
+```
+
+**Uso no template:**
+
+```html
+<p>Longo: {{ 'f' | sexo }}</p>
+<p>Curto: {{ 'f' | sexo:{ short: true } }}</p>
+```
+
+---
+
+## 6. Notas sobre Angular 20
+
+- **Standalone por padrão**: pipes standalone funcionam muito bem com **componentes standalone**.
+- **Control flow moderno**: combine com `@for`/`@if`/`@switch` para escrever templates mais claros.
+- **Arquivos**: ainda é comum encontrar o sufixo `.pipe.ts`; alguns esquemas podem preferir nomes mais curtos em projetos recentes. O comportamento pode variar conforme o template de projeto e atualizações do CLI.
+
+---
