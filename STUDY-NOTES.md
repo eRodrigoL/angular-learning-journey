@@ -1,8 +1,8 @@
-# DIÁRIO DE APRENDIZAGEM
+# NOTAS DE APRENDIZAGEM
 
 ---
 
-## Aula 01 - Boas-vindas - 20/10/2025
+## Aula 01 - Boas-vindas
 
 Boas-vindas + informações sobre o curso
 
@@ -10,7 +10,7 @@ Boas-vindas + informações sobre o curso
 
 ---
 
-## Aula 02 - O que é SPA e o que é Angular - 20/10/2025
+## Aula 02 - O que é SPA e o que é Angular
 
 **SPA (Single Page Application)**:
 
@@ -33,7 +33,7 @@ Boas-vindas + informações sobre o curso
 
 ---
 
-## Aula 03 - Documentação Angular - 20/10/2025
+## Aula 03 - Documentação Angular
 
 - **Site oficial**: [https://angular.dev](https://angular.dev) (Guides, Tutorials, API).
 - **Como ler a doc**:
@@ -45,9 +45,10 @@ Boas-vindas + informações sobre o curso
 
 ---
 
-## Aula 04 - Setup de um projeto - 20/10/2025
+## Aula 04 - Setup de um projeto
 
-**Pré-requisitos**
+### Pré-requisitos
+
 Verifique Node.js (LTS recomendado) e npm:
 
 ```bash
@@ -55,66 +56,65 @@ node -v
 npm -v
 ```
 
-**Instalar Angular CLI**
-Opção 1 (mais recente):
+### Instalar Angular CLI
+
+Versão mais recente:
 
 ```bash
 npm i -g @angular/cli
 ng version
 ```
 
-Opção 2 (versão específica):
+Versão específica (ex: v20.3.6):
 
 ```bash
 npm i -g @angular/cli@20.3.6
 ng version
 ```
 
-**Criar projeto**
-(respostas equivalentes às escolhas feitas no prompt)
+### Criar projeto
+
+Rode `ng new <nome-do-app>` trocando `<nome-do-app>` pelo nome que o projeto terá.
+
+Nome de exemplo: **_meu-primeiro-app-angular_**
 
 ```bash
-ng new <nome-do-app>
+ng new <meu-primeiro-app-angular>
 # stylesheet format: SCSS
 # Server-Side Rendering (SSR): N
 # zoneless: N
 # AI tools: None
 ```
 
-> **Stylesheet Format: Sass (SCSS)**
->
-> - O que é: pré-processador de CSS com variáveis, mixins, aninhamento etc.
-> - Por que escolher: estilos mais organizados e reutilizáveis.
-> - Alternativas: CSS, Sass (indented), Less (dependendo do preset).
-> - Impacto: o projeto nasce com arquivos `.scss` e build já configurado.
+**Stylesheet Format: Sass (SCSS)**:
 
-.
+- O que é: pré-processador de CSS com variáveis, mixins, aninhamento etc.
+- Por que escolher: estilos mais organizados e reutilizáveis.
+- Alternativas: CSS, Sass (indented), Less (dependendo do preset).
+- Impacto: o projeto nasce com arquivos `.scss` e build já configurado.
 
-> **SSR/SSG: No**
->
-> - O que é: SSR renderiza HTML no servidor (melhora SEO/TTFB); SSG gera HTML estático no build.
-> - Por que “No”: simplifica o começo (menos camadas/deploys).
-> - Quando “Yes”: apps públicas com SEO/preview/primeiro carregamento crítico.
-> - Como ligar depois: `ng add @angular/ssr` (cria setup para SSR/Prerender).
+**SSR/SSG: No**:
 
-.
+- O que é: SSR renderiza HTML no servidor (melhora SEO/TTFB); SSG gera HTML estático no build.
+- Por que “No”: simplifica o começo (menos camadas/deploys).
+- Quando “Yes”: apps públicas com SEO/preview/primeiro carregamento crítico.
+- Como ligar depois: `ng add @angular/ssr` (cria setup para SSR/Prerender).
 
-> **Zoneless (sem zone.js): No**
->
-> - O que é: remove zone.js e usa detecção de mudanças orientada por **Signals**.
-> - Por que “No”: caminho tradicional; muitos exemplos/libs assumem zone.js.
-> - Quando “Yes”: foco em performance/controle fino de change detection.
-> - Observação: zoneless exige padrões mais explícitos para atualizar a UI.
+**Zoneless (sem zone.js): No**:
 
-.
+- O que é: remove zone.js e usa detecção de mudanças orientada por **Signals**.
+- Por que “No”: caminho tradicional; muitos exemplos/libs assumem zone.js.
+- Quando “Yes”: foco em performance/controle fino de change detection.
+- Observação: zoneless exige padrões mais explícitos para atualizar a UI.
 
-> **AI Tools: None**
->
-> - O que é: a CLI pode pré-configurar integrações (prompts, regras, snippets).
-> - Por que “None”: evita ruído no começo; pode adicionar depois.
-> - Se escolher outra: a CLI cria arquivos/configs de boas práticas da ferramenta.
+**AI Tools: None**:
 
-**Rodando o projeto**
+- O que é: a CLI pode pré-configurar integrações (prompts, regras, snippets).
+- Por que “None”: evita ruído no começo; pode adicionar depois.
+- Se escolher outra: a CLI cria arquivos/configs de boas práticas da ferramenta.
+
+### Rodar projeto
+
 A opção **`-o`** (`--open`) abre o navegador automaticamente em `http://localhost:4200` ao terminar a compilação.
 Sem **`-o`**, abra manualmente: `http://localhost:4200`.
 
@@ -127,10 +127,9 @@ ng serve -o
 
 ---
 
-## Aula 05 - Anatomia de uma App Angular - 20/10/2025
+## Aula 05 - Anatomia de uma App Angular
 
-**Visão geral**
-(standalone por padrão)
+### Visão geral
 
 - Projeto **sem NgModule**: o bootstrap acontece em `main.ts` com `bootstrapApplication(AppComponent, appConfig)`.
 - Configurações globais em `src/app/app.config.ts` (providers como Router, HttpClient, animações etc.).
@@ -141,8 +140,7 @@ ng serve -o
 - `favicon.ico` na raiz do projeto (fora de `src/`).
 - Arquivos de configuração na raiz: `angular.json`, `tsconfig*.json`, `package.json`, `.editorconfig`, `.gitignore`, `README.md`.
 
-**Árvore real do seu projeto**
-(No estágio inicial)
+### **Árvore real do seu projeto** (No estágio inicial)
 
 ```text
 nome-do-projeto
@@ -173,8 +171,7 @@ nome-do-projeto
 └─ tsconfig.spec.json          # tsconfig dos testes
 ```
 
-**Conceitos-chave no Angular 20**
-(que impactam a anatomia)
+### **Conceitos-chave no Angular 20** (que impactam a anatomia)
 
 - **Control Flow moderno**: preferir a nova sintaxe `@if`, `@for`, `@switch`. As diretivas antigas `*ngIf`, `*ngFor`, `*ngSwitch` estão **deprecadas**.
 - **Signals estáveis**: APIs como `signal`, `computed`, `effect` e utilitários (`toSignal` etc.).
@@ -182,8 +179,7 @@ nome-do-projeto
 - **SSR/hidratação**: _incremental hydration_ disponível; habilitar quando usar SSR (ex.: `provideClientHydration(...)`).
 - **Requisitos**: Node **>= 20.11.1** (ou >= 22.11) e TypeScript **5.8.x**.
 
-**Boas práticas neste layout**
-(E também em outros)
+### **Boas práticas no layout**
 
 - **Componentes enxutos** + **services** para lógica/IO; componentes focados em UI.
 - **Lazy loading** por feature; manter `app.routes.ts` organizado por áreas.
@@ -195,7 +191,7 @@ nome-do-projeto
 
 ---
 
-## Aula 06 - Extensões VS Code úteis - 20/10/2025
+## Aula 06 - Extensões VS Code úteis
 
 Instale e configure as extensões abaixo para acelerar o fluxo:
 
@@ -266,17 +262,19 @@ npm -v
 
 ## Aula 07 — O que são **Componentes** no Angular
 
-> **Definição**: componente é a **unidade básica de UI** no Angular.
-> Junta **lógica** (classe TypeScript), **template** (HTML), **estilos** (CSS/SCSS) e **metadados** (decorator @Component).
-> No Angular moderno (v20), componentes são **standalone por padrão** e se conectam via **Inputs/Outputs**, **rotas** e **serviços**.
+**_COMPONENTE_** é a **unidade básica de UI** no Angular.
+com TS (classe e metadados) + HTML (template) + SCSS (estilo) e, opcionalmente, SPEC.TS (testes).
 
-Ou seja: **Componente = unidade de UI** com TS + HTML + estilos (e, opcionalmente, testes).
+Junta **lógica** (classe TypeScript), **template** (HTML), **estilos** (CSS/SCSS) e **metadados** (decorator @Component).
+Componentes são **standalone por padrão** e se conectam via **Inputs/Outputs**, **rotas** e **serviços**.
 
 ---
 
 ### Como gerar um componente?
 
-O **Angular CLI** gera os artefatos do projeto. Para componentes:
+O **Angular CLI** gera os artefatos para o projeto através do comando `ng generate`.
+
+Para gerar um artefato "componente" o comando é:
 
 ```bash
 ng generate component <nome>
@@ -291,15 +289,15 @@ ng g c <nome>
 > **Importante**: `<nome>` na verdade representa um **caminho**, onde barras "`/`" separam pasta e subpastas. O **último segmento** define **(a)** a **pasta final** criada, **(b)** o **seletor** (prefixado, ex.: `app-`), e **(c)** o **nome da classe** em **PascalCase**.  
 > Ex.: `components/nome-do-componente` → classe `NomeDoComponente`, seletor `app-nome-do-componente`.
 
-#### O que é gerado
+### O que é gerado
 
-Comando:
+Para o comando de exemplo
 
 ```bash
 ng g c components/nome-desejado
 ```
 
-Estrutura criada (padrão v20):
+Estrutura criada (padrão Angular 20) é:
 
 ```txt
 src/
@@ -312,7 +310,7 @@ src/
          └─ nome-desejado.ts         ⭠ classe + metadados (@Component) do componente
 ```
 
-Arquivo principal: classe + metadados (@Component) do componente:
+**Arquivo principal: classe + metadados (@Component) do componente:**
 
 ```ts
 // src/app/components/nome-desejado/nome-desejado.ts
@@ -329,7 +327,9 @@ export class NomeDesejado {}
 // nome da classe 👆🏻 = último segmento em PascalCase, sem hífens
 ```
 
-**Opções úteis (podem ser combinadas):**
+### Opções úteis\*\*
+
+O comando `ng g c <nome>` pode receber as seguintes opções:
 
 - `--style=scss` → cria arquivo de estilo em SCSS
 - `--skip-tests` → não cria o arquivo de testes `.spec.ts`
@@ -342,9 +342,9 @@ export class NomeDesejado {}
 
 ---
 
-### Usando o componente
+### Como usar o componente
 
-Para **declarar** o componente do exemplo abaixo
+Para usar o componente do exemplo abaixo
 
 ```ts
 // src/app/components/componente-desejado/componente-desejado.ts
@@ -393,13 +393,22 @@ Para mudar o seletor, gere com `--selector` **ou** edite o campo `selector` no d
 
 ---
 
+### Boas práticas rápidas
+
+- **Kebab-case consistente**: mantenha o mesmo nome base entre `.ts`/`.html`/`.scss`/`.spec.ts`.
+- **Uma responsabilidade por componente**: UI e lógica de apresentação; mova regra de negócio para **services**.
+- **Imports explícitos**: adicione em `imports` tudo que o template requer.
+- **Padrões modernos**: use o **control flow** novo (`@if`, `@for`, `@switch`) e **Signals** quando precisar de estado local reativo e previsível.
+
+---
+
 > **AVISO IMPORTANTE!!!**
 >
-> No Angular 20, o CLI simplificou simplificou a convenção de nomes de arquivos, passando a gerar **nome curtos**, sem os sufixos no meio.
+> No Angular 20, o CLI simplificou a convenção de nomes de arquivos, passando a gerar **nomes curtos**, sem os sufixos no meio.
 >
 > Ex.: `home.ts`, `home.html`, `home.scss` (em vez de `home.component.ts/html/scss`).
 >
-> Os nome curtos valem para os componentes (`.components`), serviço (`.serviço`) e diretiva (`.iretiva`).
+> Os nomes curtos valem para os componentes (`.components`), serviço (`.serviço`) e diretiva (`.iretiva`).
 >
 > Porém os geradores de outros artefatos mantêm o sufixo tipo no nome do arquivo, só que com **hífen** (não mais com ponto):
 >
@@ -408,15 +417,6 @@ Para mudar o seletor, gere com `--selector` **ou** edite o campo `selector` no d
 > - Resolvers → `user-resolver.ts`
 > - Modules → `shared-module.ts`
 > - Pipes → `currency-pipe.ts`
-
----
-
-### Boas práticas rápidas
-
-- **Kebab-case consistente**: mantenha o mesmo nome base entre `.ts`/`.html`/`.scss`/`.spec.ts`.
-- **Uma responsabilidade por componente**: UI e lógica de apresentação; mova regra de negócio para **services**.
-- **Imports explícitos**: adicione em `imports` tudo que o template requer.
-- **Padrões modernos**: use o **control flow** novo (`@if`, `@for`, `@switch`) e **Signals** quando precisar de estado local reativo e previsível.
 
 ---
 
@@ -1513,7 +1513,7 @@ Havendo as páginas **Page1** e **Page2** geradas pelo comando `ng g c pages/pag
 
 > **Nota sobre `&&`**: na maioria dos shells (bash, zsh, PowerShell, etc.), `&&` **encadeia comandos** e só executa o próximo se o anterior teve sucesso (exit code 0). Se algum falhar, a cadeia é interrompida.
 
-Para contruir uma navegação entre as páginas é necessário seguir os passos a seguir:
+Para construir uma navegação entre as páginas é necessário seguir os passos a seguir:
 
 ---
 
@@ -1633,7 +1633,7 @@ export const routes: Routes = [
   { path: 'relatorio', component: RelatorioPage, data: { requiresAuth: true, area: 'financeiro' } }
   ```
 
-- **`runGuardsAndResolvers` ➝** controla quando reevaluar guards/resolvers (ex.: 'paramsChange').
+- **`runGuardsAndResolvers` ➝** controla quando reavaliar guards/resolvers (ex.: 'paramsChange').
 
   ```ts
   {
@@ -1692,7 +1692,7 @@ Feita a limpeza ou edição desejada no HTML raiz, certifique incluir ao menos u
 
 #### 3. Construção dos links de navegação
 
-- Importe o `RouterLink` no coponente que ativará a navegação
+- Importe o `RouterLink` no componente que ativará a navegação
 
 ```ts
 // src/app/pages/page1/page1.ts
@@ -1708,7 +1708,7 @@ import { RouterLink } from "@angular/router"; // importação
 export class Page1 {}
 ```
 
-- Contrua o link de navegação no template do componente que ativará a navegação
+- Construa o link de navegação no template do componente que ativará a navegação
 
 ```html
 <!-- src/app/pages/page1/page1.html -->
@@ -1839,7 +1839,7 @@ export class Page1 {}
    }
    ```
 
-8. Construídas os links de navegação no template Toolbar:
+8. Construídos os links de navegação no template Toolbar:
 
    ```html
    <!-- src/app/components/toolbar/toolbar.html -->
