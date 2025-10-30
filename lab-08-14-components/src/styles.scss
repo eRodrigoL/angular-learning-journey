@@ -1,1 +1,62 @@
-/* You can add global styles to this file, and also import other style files */
+// src/styles.scss
+// Reset scss baseado no "Modern CSS Reset" de Andy Bell
+
+/* 1) Box sizing consistente em tudo */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 2) Zera margens padrão e melhora tipografia base */
+* {
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 3) Mídias responsivas por padrão */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* 4) Formulários herdam tipografia do documento */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* 5) Quebra de linha mais robusta para textos */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+/* 6) Garante um contexto previsível no root do Angular */
+app-root {
+  display: block;
+  min-height: 100%;
+  isolation: isolate;
+}
