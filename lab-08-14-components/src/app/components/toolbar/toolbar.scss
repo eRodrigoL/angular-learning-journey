@@ -1,0 +1,195 @@
+// src/app/components/toolbar/toolbar.scss
+
+// ESTILIZAÇÃO GERADA POR IA
+
+/* ---------------------------- */
+/* Variáveis de tema            */
+/* ---------------------------- */
+:host {
+  --sidenav-bg: oklch(24% 0.02 260); /* Cor de fundo base do menu (escuro) */
+  --sidenav-fg: oklch(92% 0.02 260); /* Cor do texto principal (claro) */
+  --sidenav-muted: oklch(70% 0.02 260); /* Cor de texto secundário (título h1) */
+  --sidenav-border: oklch(35% 0.02 260); /* Cor de bordas/divisórias */
+  --sidenav-accent: oklch(70% 0.13 260); /* Cor de destaque (barra lateral e foco) */
+  --sidenav-accent-ink: oklch(25% 0.05 260); /* Tinta/contorno para realce */
+
+  --sidenav-w: 260px; /* Largura padrão do aside na versão desktop */
+}
+
+/* ---------------------------- */
+/* Layout base                  */
+/* ---------------------------- */
+.sidenav {
+  position: sticky; /*               | Fixa o menu durante o scroll até o limite do container */
+  top: 0; /*                         | Mantém grudado no topo quando sticky */
+  align-self: start; /*              | Faz o aside alinhar no topo quando usado dentro de grid/flex */
+  display: grid; /*                  | Usa grid para organizar título e navegação */
+  grid-template-rows: auto 1fr; /*   | Linha 1 para o título; linha 2 ocupa o restante (nav) */
+  gap: 0.75rem; /*                   | Espaçamento entre título e navegação */
+
+  width: var(--sidenav-w); /*        | Largura do aside (desktop) */
+  min-height: 100dvh; /*             | Altura mínima: 100% da viewport dinâmica (móvel/desktop) */
+
+  padding: 1rem; /*                  |Espaçamento interno geral */
+  background: linear-gradient(
+    /* Fundo com leve gradiente para profundidade */ 180deg,
+    color-mix(in oklch, var(--sidenav-bg) 90%, black),
+    var(--sidenav-bg)
+  );
+  color: var(--sidenav-fg); /*                          | Cor do texto padrão no aside */
+  border-right: 1px solid var(--sidenav-border); /*     | Linha divisória à direita do menu */
+  box-shadow: 0 0 0 1px /*                        | Sutileza de moldura interna para contraste */
+    color-mix(in oklch, var(--sidenav-bg) 80%, black) inset;
+}
+
+/* Título */
+.sidenav > h1 {
+  font: 700 clamp(1rem, 2vw + 0.5rem, 1.25rem) / 1.1 /* | Peso, tamanho fluido e altura de linha */
+      system-ui,
+    -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; /* Fontes de fallback */
+  color: var(--sidenav-muted); /*                       | Título com cor mais suave */
+  letter-spacing: 0.02em; /*                            | Espaçamento entre letras sutil */
+  margin: 0.25rem 0 0.5rem; /*                          | Margens superior e inferior do título */
+}
+
+/* Navegação */
+.sidenav__nav {
+  overflow: auto; /*            | Permite rolagem interna quando lista for grande */
+  padding-right: 0.25rem; /*    | Espaço para não colar na scrollbar */
+  scrollbar-gutter: stable; /*  | Mantém espaço de gutter da scrollbar estável */
+}
+
+/* Lista e itens */
+.sidenav__list {
+  list-style: none; /*  | Remove marcadores da UL */
+  margin: 0; /*         | Remove margens padrão */
+  padding: 0; /*        | Remove padding padrão */
+  display: grid; /*     | Usa grid para espaçar itens */
+  gap: 0.25rem; /*      | Espaço vertical entre itens */
+}
+
+.sidenav__item {
+  border-radius: 0.5rem; /*   | Bordas arredondadas do item */
+  overflow: clip; /*          | Esconde overflow respeitando o border-radius */
+}
+
+/* Links */
+.sidenav__item > a {
+  display: grid; /*                    | Layout em grid para barra decorativa + texto */
+  grid-template-columns: 8px 1fr; /*   | Coluna 1: barra; coluna 2: conteúdo/título */
+  align-items: center; /*              | Centraliza verticalmente o conteúdo do link */
+  gap: 0.75rem; /*                     | Espaço entre barra e texto */
+
+  text-decoration: none; /*            | Remove sublinhado padrão do link */
+  color: var(--sidenav-fg); /*         | Herda cor clara do tema */
+
+  padding: 0.625rem 0.75rem; /*        | Área clicável confortável (vertical x horizontal) */
+  border: 1px solid transparent; /*    | Borda transparente para não “pular” ao focar */
+  border-radius: 0.5rem; /*            | Bordas arredondadas do link */
+
+  background: color-mix(
+    /* Fundo levemente mais claro que o bg do aside */ in oklch,
+    var(--sidenav-bg) 85%,
+    black
+  );
+  transition:  /* Animações suaves de interação */ background 0.18s ease, border-color 0.18s ease,
+    box-shadow 0.18s ease, translate 0.18s ease;
+
+  grid-template-columns: 6px 1fr; /*                  | Barra um pouco mais estreita no mobile */
+  padding: 0.5rem 0.625rem; /*                        | Área clicável ajustada para telas pequenas */
+  cursor: pointer; /*                                 | Indica que é clicável em dispositivos touch */
+  -webkit-tap-highlight-color: transparent; /*        | Remove destaque azul no toque em iOS/Android */
+
+  &::before {
+    content: ''; /*             | Gera a barra colorida da primeira coluna */
+    inline-size: 100%; /*       | Ocupa toda a largura da coluna (8px) */
+    block-size: 100%; /*        | Ocupa toda a altura do item */
+    background: color-mix(
+      /* Cor da barra com um pouco de branco */ in oklch,
+      var(--sidenav-accent) 70%,
+      white
+    );
+    border-radius: 999px; /*    | Deixa a barra “pílula” */
+    opacity: 0.5; /*            | Barra mais discreta no estado normal */
+  }
+
+  h2 {
+    margin: 0; /*               | Remove margem padrão do h2 dentro do link */
+    font: 600 0.975rem/1.2 /* Peso, tamanho e line-height do título do item */ system-ui,
+      -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+    letter-spacing: 0.01em; /*  | Leve espaçamento entre letras */
+    pointer-events: none; /* Clique passa pelo h2 e aciona o link do pai */
+  }
+}
+
+/* Hover */
+.sidenav__item > a:hover {
+  background: color-mix(
+    /* Fundo um pouco mais destacado ao passar o mouse */ in oklch,
+    var(--sidenav-bg) 75%,
+    black
+  );
+  translate: 0 -1px; /*                     | Levanta 1px para sensação de clique */
+  border-color: var(--sidenav-border); /*   | Mostra borda sutil */
+}
+
+/* Focus (teclado/assistivo) */
+.sidenav__item > a:focus-visible {
+  outline: none; /*                         | Remove outline padrão do navegador */
+  border-color: var(--sidenav-accent); /*   | Realça a borda com a cor de destaque */
+  box-shadow: 0 0 0 3px /*                  | Anel de foco acessível e bem visível */
+    color-mix(in oklch, var(--sidenav-accent) 35%, white);
+  background: color-mix(
+    /* Aclara um pouco o fundo no foco */ in oklch,
+    var(--sidenav-bg) 70%,
+    black
+  );
+}
+
+/* Estado ativo (rota atual) via routerLinkActive="active" */
+.sidenav__item > a.active {
+  background: color-mix(
+    /* Fundo com leve mistura do accent */ in oklch,
+    var(--sidenav-accent) 12%,
+    var(--sidenav-bg)
+  );
+  border-color: color-mix(
+    /* Borda mais visível no ativo */ in oklch,
+    var(--sidenav-accent) 40%,
+    var(--sidenav-border)
+  );
+  box-shadow: 0 0 0 1px /*                 | Moldura interna para reforçar ativo */
+    color-mix(in oklch, var(--sidenav-accent) 35%, var(--sidenav-accent-ink)) inset;
+
+  &::before {
+    background: var(--sidenav-accent); /*  | Barra colorida fica sólida no ativo */
+    opacity: 1; /*                         | Totalmente opaca */
+  }
+
+  h2 {
+    color: var(--sidenav-fg); /*           | Garante bom contraste no título ativo */
+  }
+}
+
+/* ---------------------------- */
+/* Responsivo                   */
+/* ---------------------------- */
+@media (max-width: 820px) {
+  :host {
+    --sidenav-w: 100%;
+  } /* Em telas pequenas, ocupa toda a largura */
+
+  .sidenav {
+    position: relative; /*                              | Deixa de ser sticky para não ocupar a tela toda */
+    min-height: auto; /*                                | Altura automática (conteúdo determina) */
+    width: 100%; /*                                     | Largura total da tela */
+    border-right: 0; /*                                 | Remove borda direita */
+    border-bottom: 1px solid var(--sidenav-border); /*  | Usa borda inferior para separar do conteúdo */
+    border-radius: 0 0 0.75rem 0.75rem; /*              | Arredonda cantos inferiores */
+    padding: 0.75rem; /*                                | Ajusta padding para dispositivos menores */
+  }
+
+  .sidenav__nav {
+    overflow: visible; /*                               | Sem rolagem interna em mobile (normalmente) */
+  }
+}
