@@ -1277,6 +1277,151 @@ export class ListaComponent {
 
 ---
 
+agora eu quero o commit para esta adição
+
+## Aula 12 — **Pipes** no Angular (v20)
+
+> **Pipes** formatam/transformam valores **no template** sem alterar o dado original.  
+> Exemplos: maiúsculas/minúsculas, número, data, moeda e o **pipe assíncrono** (`async`).
+
+---
+
+### Por que usar Pipes?
+
+- **Legibilidade**: formatação perto do local de exibição.
+- **Reuso**: a mesma transformação em vários templates.
+- **Performance**: pipes **puros** recalculam só quando a **entrada muda**.
+
+---
+
+## 1) Pipes nativos mais usados
+
+| Pipe           | Exemplo                         | **Efeito/Observação**                                                                                                                                                                                                                                                                                                                         |
+| -------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `uppercase`    | `{{ nome \| uppercase }}`       | Converte para **MAIÚSCULAS**.                                                                                                                                                                                                                                                                                                                 |
+| `lowercase`    | `{{ nome \| lowercase }}`       | Converte para **minúsculas**.                                                                                                                                                                                                                                                                                                                 |
+| `titlecase`    | `{{ titulo \| titlecase }}`     | **Primeira letra** de cada palavra em maiúscula.                                                                                                                                                                                                                                                                                              |
+| `number`       | `{{ valor \| number:'1.2-2' }}` | Formata número; **separadores** (ponto/vírgula) **dependem do locale**. Pode informar `locale`: `{{ valor \| number:'1.2-2':'pt-BR' }}`.                                                                                                                                                                                                      |
+| **`currency`** | **`{{ salario \| currency }}`** | Formata moeda. **Sem código** usa **DEFAULT_CURRENCY_CODE** (padrão: **USD**). Para outra moeda: `{{ salario \| currency:'BRL' }}`. **Ordem e separadores** dependem do **locale** (ex.: `'en-US'` → **R$2,000.00**, `'pt-BR'` → **R$ 2.000,00**). Também aceita `locale` inline: `{{ salario \| currency:'BRL':'symbol':'1.2-2':'pt-BR' }}`. |
+| `percent`      | `{{ taxa \| percent:'1.0-2' }}` | Converte para porcentagem multiplicando por 100 e adicioando **%** **Separadores/estilo** dependem do locale. Pode informar `locale`: `{{ taxa \| percent:'1.0-2':'pt-BR' }}`.                                                                                                                                                                |
+| `date`         | `{{ hoje \| date:'short' }}`    | Formata **datas** conforme locale/timezone. Você pode passar **timezone** e/ou **locale**: `{{ hoje \| date:'mediumDate':'UTC':'pt-BR' }}`.                                                                                                                                                                                                   |
+| `json`         | `{{ objeto \| json }}`          | Serializa para JSON (útil para **debug**, evite em produção).                                                                                                                                                                                                                                                                                 |
+| `slice`        | `{{ texto \| slice:0:10 }}`     | Retorna **substring** (ou fatia de lista).                                                                                                                                                                                                                                                                                                    |
+| `async`        | `{{ total$ \| async }}`         | **Desempacota** Observable/Promise; renderiza o **valor emitido**.                                                                                                                                                                                                                                                                            |
+
+> **Nota:**
+>
+> É possível mudar o **locate** no `app.config.ts` (ou bootstrap) e mudando o padrão na aplicação inteira.
+>
+> ```ts
+> // app.config.ts (exemplo)
+> import { LOCALE_ID, DEFAULT_CURRENCY_CODE } from "@angular/core";
+> import { registerLocaleData } from "@angular/common";
+> import localePt from "@angular/common/locales/pt";
+>
+> registerLocaleData(localePt);
+>
+> export const appConfig = {
+>   providers: [
+>     { provide: LOCALE_ID, useValue: "pt-BR" }, // locale padrão (números, datas, percent)
+>     { provide: DEFAULT_CURRENCY_CODE, useValue: "BRL" }, // moeda padrão para currency sem código
+>   ],
+> };
+> ```
+>
+> - **Ajustar só neste template**: passe o **locale como argumento** do pipe (`number/percent/currency/date` aceitam locale param).
+
+---
+
+## 2) Exemplo de tabela (com `@for` e `currency`)
+
+**Classe (`lista.ts`)**:
+
+```ts
+baseDeDados = [
+  { nome: "nome1", sexo: "feminino", idade: 20, salario: 5500 },
+  { nome: "nome2", sexo: "masculino", idade: 37, salario: 2980 },
+  { nome: "nome3", sexo: "masculino", idade: 18, salario: 3100 },
+  { nome: "nome4", sexo: "feminino", idade: 63, salario: 11000 },
+];
+```
+
+**Template (`lista.html`)**:
+
+```html
+<table>
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Sexo</th>
+      <th>Idade</th>
+      <th>Salário</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (item of baseDeDados; track item.nome) {
+    <tr>
+      <td>{{ item.nome | uppercase }}</td>
+      <td>{{ item.sexo | lowercase }}</td>
+      <td>{{ item.idade }}</td>
+      <td>{{ item.salario | currency:'BRL' }}</td>
+    </tr>
+    } @empty {
+    <tr>
+      <td colspan="4">Sem registros</td>
+    </tr>
+    }
+  </tbody>
+</table>
+
+<p><strong>Debug (json):</strong></p>
+<pre>{{ baseDeDados | json }}</pre>
+```
+
+---
+
+## 3) Pipe assíncrono (`async`) — exemplo mínimo
+
+**Classe (`total.ts`)**:
+
+```ts
+import { interval, map } from "rxjs";
+
+total$ = interval(1000).pipe(map((v) => v * 10));
+```
+
+**Template**:
+
+```html
+<p>Total: {{ total$ | async }}</p>
+```
+
+---
+
+## 4) Boas práticas
+
+- Configure **locale** (`LOCALE_ID`) e, se quiser, a **moeda padrão** (`DEFAULT_CURRENCY_CODE`) para evitar repetição.
+- Use pipes para **formatação leve**; cálculos pesados ficam no TypeScript.
+- `json`: útil para **inspeção** durante desenvolvimento.
+- Em listas, use `@for` com **track estável** (ex.: `track item.id`).
+
+---
+
+## 5) Erros comuns (e como evitar)
+
+- Esperar formatação **pt-BR** sem configurar **locale** → defina `LOCALE_ID='pt-BR'` **ou** passe `'pt-BR'` no pipe.
+- Ver **USD** ao usar `{{ salario \| currency }}` → informe **código da moeda** ou ajuste **DEFAULT_CURRENCY_CODE**.
+- Passar valores não numéricos/indefinidos → garanta `number` **ou** **string numérica** e trate nulos.
+- Misturar `*ngFor` com `@for` no mesmo trecho → **padronize** no novo control flow.
+
+---
+
+> **Lembrete (v20)**: nomes curtos de arquivos (ex.: `lista.ts`, `lista.html`, `lista.scss`) e tags sem conteúdo **auto-fechadas** (ex.: `<router-outlet />`) são comuns.
+
+---
+
+---
+
 ## Aula 13 — Criando **Pipes customizadas**
 
 > **Pipes** permitem aplicar transformações de exibição diretamente no **template**, sem alterar o dado original.
