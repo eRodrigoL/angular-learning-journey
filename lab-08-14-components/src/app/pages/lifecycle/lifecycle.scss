@@ -1,0 +1,108 @@
+/* src/app/pages/lifecycle/lifecycle.scss */
+.page {
+  display: grid;
+  gap: 1rem;
+  max-width: 880px;
+  margin: 1.5rem auto;
+}
+
+.page__header {
+  display: grid;
+  gap: 0.25rem;
+}
+.page__subtitle {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* Badge de seção */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ddd;
+  font-size: 0.75rem;
+  background: #f9f9f9;
+}
+.badge--info {
+  background: #eef6ff;
+  border-color: #cfe3ff;
+}
+.badge--accent {
+  background: #fff1ee;
+  border-color: #ffd5cb;
+}
+
+/* Ações do Pai */
+.toolbar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  border: 1px solid #e5e5e5;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+
+  button {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 0.375rem;
+    background: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: #f6f6f6;
+    }
+  }
+}
+
+/* Painel de valores enviados ao Filho */
+.panel {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+}
+.panel__title {
+  margin: 0 0 0.5rem;
+}
+.panel__row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding: 0.25rem 0;
+}
+.label {
+  color: #444;
+  font-weight: 600;
+}
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+}
+
+/* Seção de projeção */
+.projected {
+  display: grid;
+  gap: 0.5rem;
+}
+.projected__title {
+  margin: 0;
+}
+
+/* Log do Pai */
+.log {
+  padding: 0.75rem;
+  border: 1px dashed #999;
+  border-radius: 0.5rem;
+}
+.log__title {
+  margin: 0 0 0.5rem;
+}
+.log__list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.log__item {
+  line-height: 1.35;
+}

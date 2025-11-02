@@ -1,0 +1,52 @@
+/* src/app/pages/lifecycle/lifecycle-child/lifecycle-child.scss */
+.child {
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+
+  &__title {
+    margin: 0 0 0.5rem 0;
+  }
+
+  &__actions {
+    margin: 0.5rem 0;
+
+    button {
+      padding: 0.375rem 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 0.375rem;
+      background: #fff;
+      cursor: pointer;
+      transition: background 0.15s;
+
+      &:hover {
+        background: #f6f6f6;
+      }
+    }
+  }
+
+  &__projected {
+    padding: 0.5rem;
+    background: #fafafa;
+    border-radius: 0.25rem;
+
+    strong {
+      display: inline-block;
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  &__notes {
+    margin-top: 0.75rem;
+
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    ul {
+      margin: 0.5rem 0 0 0;
+      padding-left: 1.25rem;
+    }
+  }
+}

@@ -1,1 +1,81 @@
-<p>lifecycle works!</p>
+<!-- src/app/pages/lifecycle/lifecycle.html -->
+<section class="page" aria-labelledby="page-title">
+  <header class="page__header">
+    <h2 id="page-title">Lifecycle Demo (Angular 20, moderno)</h2>
+    <p class="page__subtitle">
+      Exemplo 100% com <strong>signal inputs</strong> + <code>effect()</code> (sem
+      @Input/ngOnChanges).
+    </p>
+  </header>
+
+  <fieldset class="toolbar" aria-label="Ações do Pai">
+    <legend class="badge">Ações do Pai</legend>
+
+    <button (click)="toggleChild()" data-testid="btn-toggle-child">
+      {{ showChild() ? 'Remover filho' : 'Adicionar filho' }}
+    </button>
+
+    <button (click)="bumpTitle()" data-testid="btn-bump-title">Atualizar input() (title)</button>
+
+    <button (click)="mutateSettingsShallow()" data-testid="btn-mutate-settings">
+      Mutar objeto (shallow) settings.counter++
+    </button>
+
+    <button (click)="replaceSettingsObject()" data-testid="btn-replace-settings">
+      Substituir objeto settings (novo ref)
+    </button>
+
+    <button (click)="clearLog()" data-testid="btn-clear-log">Limpar Log</button>
+  </fieldset>
+
+  <section class="panel" aria-labelledby="panel-title">
+    <h3 id="panel-title" class="panel__title">
+      <span class="badge badge--info">Inputs enviados ao Filho (signals)</span>
+    </h3>
+
+    <div class="panel__row">
+      <span class="label">title (signal):</span>
+      <code data-testid="val-title">{{ titleSig() }}</code>
+    </div>
+
+    <div class="panel__row">
+      <span class="label">settings (signal):</span>
+      <code data-testid="val-settings">{{ settingsSig() | json }}</code>
+    </div>
+  </section>
+
+  <hr aria-hidden="true" />
+
+  @if (showChild()) {
+  <section class="projected" aria-labelledby="projected-title">
+    <h3 id="projected-title" class="projected__title">
+      <span class="badge badge--accent">Projeção de Conteúdo</span>
+    </h3>
+
+    <app-lifecycle-child
+      [title]="titleSig()"
+      [settings]="settingsSig()"
+      [projectedLabel]="projectedLabelSig()"
+      (eventLog)="pushLog($event)"
+      data-testid="child"
+    >
+      <!-- Conteúdo projetado: usado por AfterContentInit/Checked -->
+      <span projected #projectedMarker data-testid="projected-slot">
+        {{ projectedLabelSig() }}
+      </span>
+    </app-lifecycle-child>
+  </section>
+  }
+
+  <section class="log" aria-labelledby="log-title" aria-live="polite">
+    <h3 id="log-title" class="log__title">
+      <span class="badge">Log (pai)</span>
+    </h3>
+
+    <ul class="log__list">
+      @for (item of logs(); track $index) {
+      <li class="log__item">{{ item }}</li>
+      }
+    </ul>
+  </section>
+</section>

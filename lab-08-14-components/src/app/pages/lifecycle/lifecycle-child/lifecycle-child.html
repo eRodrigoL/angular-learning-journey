@@ -1,0 +1,30 @@
+<!-- src/app/pages/lifecycle/lifecycle-child/lifecycle-child.html -->
+<article class="child">
+  <h3 class="child__title">Filho (Signal Inputs)</h3>
+
+  <p><strong>input() title:</strong> {{ title() }}</p>
+  <p><strong>input() settings:</strong> {{ settings() | json }}</p>
+
+  <div class="child__actions">
+    <button #actionBtn type="button">Botão da View (ViewChild)</button>
+  </div>
+
+  <div class="child__projected" role="region" aria-label="Conteúdo projetado">
+    <strong>Conteúdo projetado:</strong>
+    <ng-content select="[projected]"></ng-content>
+  </div>
+
+  <details class="child__notes">
+    <summary>Notas sobre hooks (moderno)</summary>
+    <ul>
+      <li><code>constructor()</code>: DI/estado leve; sem DOM/inputs.</li>
+      <li><code>ngOnInit()</code>: inicialização; <code>effect()</code> para reagir a inputs.</li>
+      <li>
+        <code>ngAfterContentInit/Checked()</code>: projeção (<code>&lt;ng-content&gt;</code>).
+      </li>
+      <li><code>ngAfterViewInit/Checked()</code>: DOM da view pronto (<code>@ViewChild</code>).</li>
+      <li><code>ngDoCheck()</code>: detecção customizada (evite).</li>
+      <li><code>ngOnDestroy()</code>: limpeza de recursos.</li>
+    </ul>
+  </details>
+</article>
