@@ -1,0 +1,92 @@
+<!-- src/app/pages/binding/binding.html -->
+<section class="page">
+  <h2>Binding Demo (Aula 09)</h2>
+
+  <!-- ======================= Interpolação ======================= -->
+  <section class="panel">
+    <h3>1) Interpolação</h3>
+    <p>
+      Produto atual:
+      <strong>{{ productSig().name }}</strong> — R$ {{ productSig().price | number : '1.2-2' }}
+    </p>
+    <p>Estoque: {{ productSig().stock }}</p>
+  </section>
+
+  <!-- ======================= Property Binding =================== -->
+  <section class="panel">
+    <h3>2) Property Binding</h3>
+
+    <div class="row">
+      <!-- width dinâmico do card -->
+      <div
+        class="product-card"
+        [style.width.px]="cardWidthPxSig()"
+        [class.is-featured]="productSig().featured"
+        [attr.aria-label]="'Card do produto ' + productSig().name"
+      >
+        <img [src]="productSig().imageUrl" alt="Imagem do produto" />
+        <h4>{{ productSig().name }}</h4>
+        <p>Preço: R$ {{ productSig().price | number : '1.2-2' }}</p>
+        <p>Estoque: {{ productSig().stock }}</p>
+
+        <button class="buy-btn" [disabled]="!canBuySig()" (click)="onBuyClick()">Comprar</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <button (click)="enlargeCard()">+ Largura</button>
+      <button (click)="shrinkCard()">− Largura</button>
+      <button (click)="onResetImg()">Resetar imagem</button>
+      <span
+        >Carrinho: <code>{{ cartCountSig() }}</code></span
+      >
+    </div>
+  </section>
+
+  <!-- ======================= Event Binding ====================== -->
+  <section class="panel">
+    <h3>3) Event Binding</h3>
+    <div class="row">
+      <input
+        placeholder="Pressione Enter p/ destacar o produto"
+        (keyup.enter)="toggleFeatured()"
+        aria-label="Campo que alterna destaque do produto com Enter"
+      />
+      <span>
+        Destaque atual:
+        <strong>{{ productSig().featured ? 'Ativo' : 'Inativo' }}</strong>
+      </span>
+    </div>
+  </section>
+
+  <!-- ======================= Two-way: clássico =================== -->
+  <section class="panel">
+    <h3>4A) Two-way clássico — [(ngModel)]</h3>
+    <div class="row">
+      <input
+        [(ngModel)]="coupon"
+        placeholder="Cupom de desconto (ex.: ANGULAR10)"
+        aria-label="Cupom via ngModel"
+      />
+      <span
+        >Cupom: <code>{{ coupon || '—' }}</code></span
+      >
+    </div>
+  </section>
+
+  <!-- ======================= Two-way: moderno (Signals + model) == -->
+  <section class="panel">
+    <h3>4B) Two-way moderno — Signals + <code>model()</code> (no Filho)</h3>
+
+    <!--
+      O filho expõe [(product)] via model<Product>().
+      O pai liga diretamente o signal productSig (banana in a box).
+    -->
+    <app-binding-child [(product)]="productSig"></app-binding-child>
+
+    <p class="hint">
+      Dica: este two-way não usa @Output manual; o <code>model()</code> cria o par
+      <code>product</code>/<code>productChange</code> automaticamente.
+    </p>
+  </section>
+</section>

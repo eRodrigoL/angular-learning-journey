@@ -1,0 +1,31 @@
+/* src/app/pages/binding/binding-child/binding-child.scss */
+.child {
+  padding: 0.75rem;
+  border: 1px solid #eee;
+  border-radius: 0.5rem;
+  background: #fafafa;
+}
+
+.grid {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+label {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}

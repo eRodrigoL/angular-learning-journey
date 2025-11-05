@@ -1,0 +1,49 @@
+/* src/app/pages/binding/binding.scss */
+.page {
+  display: grid;
+  gap: 1rem;
+  max-width: 960px;
+  margin: 1.5rem auto;
+}
+
+.panel {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.product-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  background: #fff;
+}
+
+.product-card.is-featured {
+  outline: 2px solid #7c3aed; /* roxo didático */
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.15);
+}
+
+.product-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.25rem;
+}
+
+.buy-btn {
+  margin-top: 0.5rem;
+}
+
+.hint {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #555;
+}

@@ -1,3 +1,4 @@
+// src/app/app.ts
 import { Toolbar } from './components/toolbar/toolbar';
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';

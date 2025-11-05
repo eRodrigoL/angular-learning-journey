@@ -1,0 +1,77 @@
+<!-- src/app/pages/binding/binding-child/binding-child.html -->
+<article class="child">
+  <h4>{{ label() }}</h4>
+
+  <div class="grid">
+    <label>
+      <span>Nome</span>
+      <!-- PROPERTY: [value] — EVENT: (input) -->
+
+      <!-- Nome -->
+      <input
+        #nameEl
+        [value]="product().name"
+        (input)="onNameInput(nameEl.value)"
+        placeholder="Nome do produto"
+      />
+    </label>
+
+    <label>
+      <span>Preço (R$)</span>
+      <!-- Preço -->
+      <input
+        #priceEl
+        inputmode="decimal"
+        [value]="product().price"
+        (input)="onPriceInput(priceEl.value)"
+        placeholder="0,00"
+      />
+    </label>
+
+    <label>
+      <span>Estoque</span>
+      <!-- Estoque -->
+      <input
+        #stockEl
+        type="number"
+        [value]="product().stock"
+        (input)="onStockInput(stockEl.value)"
+        min="0"
+      />
+    </label>
+
+    <label>
+      <span>Imagem (URL)</span>
+      <!-- Imagem -->
+      <input
+        #imgEl
+        [value]="product().imageUrl"
+        (input)="onImageUrlInput(imgEl.value)"
+        placeholder="https://…"
+      />
+    </label>
+
+    <!-- Destaque -->
+    <label class="check">
+      <input
+        #featEl
+        type="checkbox"
+        [checked]="product().featured"
+        (change)="onFeaturedToggle(featEl.checked)"
+      />
+      <span>Destacar produto</span>
+    </label>
+  </div>
+
+  <div class="row">
+    <button type="button" (click)="resetToExample()">Restaurar exemplo</button>
+    <span
+      >Edições locais: <code>{{ localEdits() }}</code></span
+    >
+  </div>
+
+  <details>
+    <summary>Produto (debug)</summary>
+    <pre><code>{{ product() | json }}</code></pre>
+  </details>
+</article>
