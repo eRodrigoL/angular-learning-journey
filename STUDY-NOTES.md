@@ -1277,8 +1277,6 @@ export class ListaComponent {
 
 ---
 
-agora eu quero o commit para esta adição
-
 ## Aula 12 — **Pipes** no Angular (v20)
 
 > **Pipes** formatam/transformam valores **no template** sem alterar o dado original.  

@@ -1,0 +1,106 @@
+<!-- src/app/pages/flow/flow.html -->
+<section class="page">
+  <h2>Flow Demo (&#64;if / &#64;switch / &#64;for)</h2>
+
+  <div class="toolbar">
+    <button type="button" (click)="toggleFilters()">
+      {{ showFilters() ? 'Ocultar filtros' : 'Mostrar filtros' }}
+    </button>
+    <button type="button" (click)="addExample()">Adicionar exemplo</button>
+    <button type="button" (click)="clearFilters()">Limpar filtros</button>
+  </div>
+
+  @if (showFilters()) {
+  <fieldset class="filters">
+    <legend>Filtros</legend>
+
+    <div class="row">
+      <!-- Query -->
+      <input
+        #q
+        placeholder="Buscar por cliente ou ID"
+        [value]="query()"
+        (input)="onQueryInput(q.value)"
+      />
+
+      <!-- Status -->
+      <select
+        #sf
+        [value]="statusFilter()"
+        (change)="onStatusFilterChange(sf.value)"
+        aria-label="Status"
+      >
+        <option value="all">Todos</option>
+        <option value="pending">Pendentes</option>
+        <option value="paid">Pagos</option>
+        <option value="shipped">Enviados</option>
+        <option value="canceled">Cancelados</option>
+      </select>
+
+      <!-- Somente atrasados -->
+      <label class="check">
+        <input #ol type="checkbox" [checked]="onlyLate()" (change)="onOnlyLateToggle(ol.checked)" />
+        <span>Somente atrasados</span>
+      </label>
+
+      <!-- Ordenar por -->
+      <label>
+        <span>Ordenar por</span>
+        <select #ob [value]="orderBy()" (change)="onOrderByChange(ob.value)">
+          <option value="createdAt">Data</option>
+          <option value="total">Total</option>
+        </select>
+      </label>
+
+      <!-- Direção -->
+      <label>
+        <span>Direção</span>
+        <select #od [value]="orderDir()" (change)="onOrderDirChange(od.value)">
+          <option value="desc">Desc</option>
+          <option value="asc">Asc</option>
+        </select>
+      </label>
+    </div>
+  </fieldset>
+  }
+
+  <!-- Lista -->
+  <table class="orders">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Total</th>
+        <th>Criado em</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (o of filtered(); track o.id) {
+      <tr>
+        <td>{{ o.id }}</td>
+        <td>{{ o.customer }}</td>
+        <td>R$ {{ o.total | number : '1.2-2' }}</td>
+        <td>{{ o.createdAt | date : 'shortDate' }}</td>
+        <td>
+          @switch (o.status) { @case ('pending') {
+          <span class="badge badge--pending">Pendente</span> } @case ('paid') {
+          <span class="badge badge--paid">Pago</span> } @case ('shipped') {
+          <span class="badge badge--shipped">Enviado</span> } @case ('canceled') {
+          <span class="badge badge--canceled">Cancelado</span> } }
+        </td>
+        <td class="actions">
+          <button type="button" (click)="advanceStatus(o.id)">Avançar status</button>
+          <button type="button" (click)="cancelOrder(o.id)">Cancelar</button>
+        </td>
+      </tr>
+      } @empty {
+      <tr>
+        <td colspan="6">Nenhum pedido encontrado.</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</section>
