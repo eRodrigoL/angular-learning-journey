@@ -1,0 +1,37 @@
+/* src/app/pages/pipes-real/pipes-real.scss */
+.page {
+  display: grid;
+  gap: 1rem;
+  max-width: 1100px;
+  margin: 1.5rem auto;
+}
+
+.panel {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}

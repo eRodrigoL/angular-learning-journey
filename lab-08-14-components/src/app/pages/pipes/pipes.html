@@ -1,0 +1,83 @@
+<!-- src/app/pages/pipes/pipes.html -->
+<section class="page">
+  <header class="header">
+    <h2>Pipes (uso real) — Folha de Pagamentos</h2>
+    <p>Agora: {{ now$ | async | date : 'medium' }}</p>
+  </header>
+
+  <fieldset class="panel">
+    <legend>Filtros</legend>
+    <div class="row">
+      <input placeholder="Buscar por nome ou ID" [ngModel]="q()" (ngModelChange)="q.set($event)" />
+
+      <select
+        [ngModel]="sexoFiltro()"
+        (ngModelChange)="sexoFiltro.set($any($event))"
+        aria-label="Sexo"
+      >
+        <option value="all">Todos</option>
+        <option value="f">Feminino</option>
+        <option value="m">Masculino</option>
+      </select>
+
+      <label>
+        <span>Salário mínimo (BRL)</span>
+        <input
+          type="number"
+          [ngModel]="minSal() ?? ''"
+          (ngModelChange)="$any(minSal).set($event === '' ? null : +$event)"
+          min="0"
+          step="100"
+        />
+      </label>
+
+      <button type="button" (click)="clear()">Limpar</button>
+    </div>
+  </fieldset>
+
+  <section class="panel">
+    <h3>Colaboradores</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome (titlecase)</th>
+          <th>Sexo (pipe)</th>
+          <th>Sexo (short)</th>
+          <th>Admissão (date)</th>
+          <th>Dias na empresa</th>
+          <th>Salário (currency)</th>
+          <th>Bônus (percent)</th>
+          <th>Total bruto</th>
+          <th>Habilidades (slice 0..2)</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of lista(); track c.id) {
+        <tr>
+          <td>{{ c.id | uppercase }}</td>
+          <td>{{ c.nome | titlecase }}</td>
+          <td>{{ c.sexo | sexo }}</td>
+          <td>{{ c.sexo | sexo : { short: true } }}</td>
+          <td>{{ c.admissao | date : 'mediumDate' }}</td>
+          <td>{{ tempoCasaDias(c) | number : '1.0-0' }}</td>
+          <td>{{ c.salario | currency }}</td>
+          <td>{{ c.bonusRate | percent : '1.0-2' }}</td>
+          <td>{{ totalBruto(c) | currency }}</td>
+          <td>{{ c.habilidades | slice : 0 : 2 | json }}</td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="10">Nenhum colaborador encontrado</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+
+    <details>
+      <summary>Debug (json da lista filtrada)</summary>
+      <pre>{{ lista() | json }}</pre>
+    </details>
+  </section>
+</section>

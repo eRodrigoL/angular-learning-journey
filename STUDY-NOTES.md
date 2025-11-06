@@ -1292,7 +1292,7 @@ export class ListaComponent {
 
 ---
 
-## 1) Pipes nativos mais usados
+### 1. Pipes nativos mais usados
 
 | Pipe           | Exemplo                         | **Efeito/Observação**                                                                                                                                                                                                                                                                                                                         |
 | -------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1331,7 +1331,7 @@ export class ListaComponent {
 
 ---
 
-## 2) Exemplo de tabela (com `@for` e `currency`)
+### 2. Exemplo de tabela (com `@for` e `currency`)
 
 **Classe (`lista.ts`)**:
 
@@ -1378,7 +1378,7 @@ baseDeDados = [
 
 ---
 
-## 3) Pipe assíncrono (`async`) — exemplo mínimo
+### 3. Pipe assíncrono (`async`) — exemplo mínimo
 
 **Classe (`total.ts`)**:
 
@@ -1396,7 +1396,7 @@ total$ = interval(1000).pipe(map((v) => v * 10));
 
 ---
 
-## 4) Boas práticas
+### 4. Boas práticas
 
 - Configure **locale** (`LOCALE_ID`) e, se quiser, a **moeda padrão** (`DEFAULT_CURRENCY_CODE`) para evitar repetição.
 - Use pipes para **formatação leve**; cálculos pesados ficam no TypeScript.
@@ -1405,7 +1405,7 @@ total$ = interval(1000).pipe(map((v) => v * 10));
 
 ---
 
-## 5) Erros comuns (e como evitar)
+### 5. Erros comuns (e como evitar)
 
 - Esperar formatação **pt-BR** sem configurar **locale** → defina `LOCALE_ID='pt-BR'` **ou** passe `'pt-BR'` no pipe.
 - Ver **USD** ao usar `{{ salario \| currency }}` → informe **código da moeda** ou ajuste **DEFAULT_CURRENCY_CODE**.
@@ -1434,7 +1434,7 @@ total$ = interval(1000).pipe(map((v) => v * 10));
 
 ---
 
-## 1. Como gerar uma pipe
+### 1. Como gerar uma pipe
 
 **Comando:**
 
@@ -1455,7 +1455,7 @@ ng g p <nome>
 
 ---
 
-## 2. Exemplo: pipe `sexo`
+### 2. Exemplo: pipe `sexo`
 
 Objetivo: exibir **Masculino** ou **Feminino** a partir de valores curtos (`m`/`f`) ou variações.
 
@@ -1540,7 +1540,7 @@ export class ListaComponent {
 
 ---
 
-## 3. Boas práticas
+### 3. Boas práticas
 
 - **Control flow moderno**: combine com `@for`/`@if`/`@switch` para escrever templates mais claros.
 - **Pure vs Impure**: mantenha `pure: true`. Só use `pure: false` quando realmente precisar reagir a **mudanças internas** de objetos/arrays **sem trocar a referência** (custa performance).
@@ -1550,7 +1550,7 @@ export class ListaComponent {
 
 ---
 
-## 4. Erros comuns (e como evitar)
+### 4. Erros comuns (e como evitar)
 
 - **Esquecer de importar a pipe standalone** no componente → adicione em `imports: [MinhaPipe]`.
 - **Marcar impura sem necessidade** → pipes impuras executam com alta frequência; evite.
@@ -1559,7 +1559,7 @@ export class ListaComponent {
 
 ---
 
-## 5. Exemplo completo (variação com opções)
+### 5. Exemplo completo (variação com opções)
 
 Suponha que você queira exibir abreviação (`M`/`F`) quando houver a opção `short: true`.
 
@@ -1599,7 +1599,7 @@ export class SexoPipe implements PipeTransform {
 
 ---
 
-## 6. Notas sobre Angular 20
+### 6. Notas sobre Angular 20
 
 - **Standalone por padrão**: pipes standalone funcionam muito bem com **componentes standalone**.
 - **Control flow moderno**: combine com `@for`/`@if`/`@switch` para escrever templates mais claros.
@@ -1609,7 +1609,7 @@ export class SexoPipe implements PipeTransform {
 
 ---
 
-## Aula 14 — Criando componentes e adicionando navegação
+### Aula 14 — Criando componentes e adicionando navegação
 
 Em apps de página única (SPA), **navegação** significa trocar a **view** em exibição manipulando o **DOM**: o framework reconcilia e atualiza **somente** os trechos necessários da interface, sem pedir um novo documento HTML ao servidor. No Angular, o responsável por isso é o **Router**, que associa **URLs** a **componentes** (páginas) e administra o histórico do navegador.
 
