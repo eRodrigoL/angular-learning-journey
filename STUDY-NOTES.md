@@ -2006,3 +2006,500 @@ export class Page1 {}
 > - **`[routerLinkActiveOptions]="{ exact: true }"`** na home evita que `'/'` fique ativo quando você estiver em `/page1` ou `/page2`.
 
 ---
+
+---
+
+## Aula 14 — Criando componentes e adicionando navegação
+
+Em apps de página única (SPA), **navegação** significa trocar a **view** em exibição manipulando o **DOM**: o framework reconcilia e atualiza **somente** os trechos necessários da interface, sem pedir um novo documento HTML ao servidor. No Angular, o responsável por isso é o **Router**, que associa **URLs** a **componentes** (páginas) e administra o histórico do navegador.
+
+---
+
+### Importância do uso de rotas
+
+- **Navegação previsível**: mapeia URLs claras para componentes/páginas, tornando a experiência consistente.
+- **URLs compartilháveis**: cada tela tem endereço próprio (deep link, favoritos, histórico).
+- **Segurança e controle**: **guards** e **resolvers** controlam acesso, redirecionamentos e carregamento de dados antes da entrada.
+- **Performance**: **lazy loading** e **preloading** reduzem o tempo de carregamento inicial e otimizam a entrega por demanda.
+- **Acessibilidade e UX**: integra com Voltar/Avançar, restauração de rolagem e títulos de página.
+- **SEO (com SSR/Prerender)**: viabiliza indexação de páginas públicas e pré-visualizações ricas (cards com título, descrição e imagem ao compartilhar links).
+- **Escalabilidade**: organiza o código por features/rotas, facilitando manutenção e crescimento.
+- **Observabilidade**: facilita métricas, analytics e monitoramento por rota.
+
+---
+
+### Por que `routerLink="page1"` em vez de `href="page1"`?
+
+- **Sem recarregar o documento**: o `routerLink` usa o **Router** para navegação **client-side** enquanto `href` dispara um **full reload**.
+- **Estado e histórico controlados**: o Router usa a **History API** sem perder o estado da aplicação.
+- **APIs de navegação**: suporte a **query params**, **fragment**, **navigation extras** (ex.: `{ state }`) e **links relativos**:
+
+  ```html
+  <a [routerLink]="['/page1']" [queryParams]="{ filtro: 'novos' }">Page 1</a>
+  ```
+
+- **Estilização do link ativo**: com `routerLinkActive="active"` e `[routerLinkActiveOptions]="{ exact: true }"`.
+- **Coerência com rotas protegidas**: respeita **guards**, **resolvers** e estratégias de **lazy loading**.
+- **Acessibilidade**: continua sendo uma âncora `<a>` válida (com `href` gerado), mas gerenciada pelo Router.
+
+> **Resumo**: use **`routerLink`** para que o Angular gerencie a navegação de forma **rápida, controlada e integrada** ao ecossistema.
+
+---
+
+### Passo a passo básico
+
+Havendo as páginas **Page1** e **Page2** geradas pelo comando `ng g c pages/page1` e `ng g c pages/page2` ou simplesmente:
+
+```bash
+`ng g c pages/page1 && ng g c pages/page2`
+```
+
+> **Nota sobre `&&`**: na maioria dos shells (bash, zsh, PowerShell, etc.), `&&` **encadeia comandos** e só executa o próximo se o anterior teve sucesso (exit code 0). Se algum falhar, a cadeia é interrompida.
+
+Para contruir uma navegação entre as páginas é necessário seguir os passos a seguir:
+
+---
+
+#### 1. Registrar as rotas
+
+As rotas são fornecidas no bootstrap via `provideRouter(routes)` em `src/app/app.config.ts`.
+
+```ts
+// src/app/app.config.ts
+import { ApplicationConfig } from "@angular/core";
+import { provideRouter } from "@angular/router";
+import { routes } from "./app.routes";
+
+export const appConfig: ApplicationConfig = {
+  providers: [provideRouter(routes)],
+};
+```
+
+Crie/edite `src/app/app.routes.ts` mapeando caminhos (URLs) para páginas (componentes):
+
+> obs: No `app.routes.ts` o array tipado `export const routes: Routes = []` reúne todas as rotas da aplicação que o `provideRouter` usa para criar a navegação.
+
+- Importe no `app.routes.ts` os componente que serão usados como destinos da navegação (ex.: `import { Page1 } from './pages/page1/page1';`).
+- Insira em `export const routes: Routes = []` as rotas como objeto (ex.: `{ path: '', component: Page1 }`)
+- **(Recomendação):** Use uma _rota curinga_ (ex.: `{ path: "**", redirectTo: "" }`) para redireciona qualquer URL não reconhecida para uma rota conhecida.
+
+  > **Nota:** Implemente o `fallback` (rota curinga ou erro 404) por último no array de rotas, pois ela casa com qualquer caminho e, se vier antes, bloqueará as demais.
+
+```ts
+// src/app/app.routes.ts
+import { Routes } from "@angular/router";
+import { Page1 } from "./pages/page1/page1"; // importação da página 1
+import { Page2 } from "./pages/page2/page2"; // importação da página 2
+
+export const routes: Routes = [
+  { path: "", component: Page1 }, // rota inicial
+  { path: "page2", component: Page2 }, // rota para a página 2
+  { path: "**", redirectTo: "" }, // fallback: URLs desconhecidas vão para a Home
+];
+```
+
+**Alguns atributos do objeto rota**:
+
+- **`path` ➝** segmento de URL que ativa a rota. '' (vazio) costuma ser a rota inicial (home):
+
+  ```ts
+  { path: 'caminho', component: NomeDoComponente }
+  ```
+
+- **`component` ➝** componente exibido quando o path casa:
+
+  ```ts
+  { path: 'caminho', component: NomeDoComponente }
+  ```
+
+- **`pathMatch` ➝** como casar o caminho (muito usado com `path: ''`)
+
+  - **`pathMatch: 'full'` ➝** exige correspondência exata (home típica).
+
+    ```ts
+    { path: '', component: Home, pathMatch: 'full' }
+    ```
+
+  - **`pathMatch: 'prefix'` ➝** considera prefixo (comum em redirecionamentos).
+
+    ```ts
+    { path: 'page1', component: Page1, pathMatch: 'prefix' }
+    ```
+
+- **`redirectTo` ➝** em vez de renderizar um componente, redireciona para outro caminho (interno).
+
+  ```ts
+  { path: "**", redirectTo: "" }
+  ```
+
+- **`title` ➝** define `document.title` quando a rota é ativada (útil para SEO/UX).
+
+  ```ts
+   path: 'sobre', component: SobrePage, title: 'Sobre — MinhaApp' }
+  ```
+
+- **`loadComponent` ➝** lazy-load de componente standalone (carrega sob demanda).
+
+  ```ts
+  {
+    path: 'relatorio',
+    loadComponent: () => import('./pages/relatorio/relatorio')
+      .then(m => m.RelatorioPage),
+    title: 'Relatório'
+  }
+  ```
+
+- **`children` ➝** define rotas filhas (aninhadas).
+
+  ```ts
+    {
+    path: 'admin',
+    children: [
+      { path: 'usuarios', component: AdminUsersPage, title: 'Usuários' },
+      { path: 'config', component: AdminConfigPage, title: 'Configurações' },
+      { path: '', redirectTo: 'usuarios', pathMatch: 'full' }
+    ]
+  }
+  ```
+
+- **`outlet` ➝** enviar conteúdo para um router-outlet nomeado (rotas auxiliares).
+
+  ```ts
+  // Template possui <router-outlet name="sidebar"></router-outlet>
+  { path: 'ajuda', component: AjudaSidebar, outlet: 'sidebar' }
+  // URL de exemplo: /(sidebar:ajuda)
+  ```
+
+- **`data` ➝** metadados arbitrários para usar em guards, componentes, etc.
+
+  ```ts
+  { path: 'relatorio', component: RelatorioPage, data: { requiresAuth: true, area: 'financeiro' } }
+  ```
+
+- **`runGuardsAndResolvers` ➝** controla quando reevaluar guards/resolvers (ex.: 'paramsChange').
+
+  ```ts
+  {
+    path: 'perfil/:id',
+    component: PerfilPage,
+    resolve: { perfil: perfilResolver },
+    runGuardsAndResolvers: 'paramsChange' // reexecuta ao mudar :id
+  }
+  // Alternativas: 'always' | 'paramsOrQueryParamsChange'
+  ```
+
+- **`matcher` ➝** função personalizada para casar URLs com lógica própria.
+
+  ```ts
+  import { UrlSegment } from '@angular/router';
+
+  export function skuMatcher(segments: UrlSegment[]) {
+    // casa /produto/<SKU-ALFANUMÉRICO>
+    if (segments.length === 2 && segments[0].path === 'produto' && /^[A-Z0-9-]+$/.test(segments[1].path)) {
+      return { consumed: segments, posParams: { sku: segments[1] } };
+    }
+    return null;
+  }
+
+  { matcher: skuMatcher, component: ProdutoDetalhePage, title: 'Produto' }
+  ```
+
+- **`canActivate` / `canMatch` / `canDeactivate` / `resolve` ➝** guards e resolvers para controle de acesso, pré-carregamento de dados e lógica de navegação.
+
+  ```ts
+  import { authGuard } from './guards/auth.guard';
+  import { pendingChangesGuard } from './guards/pending-changes.guard';
+  import { perfilResolver } from './resolvers/perfil.resolver';
+
+  {
+    path: 'perfil/:id',
+    component: PerfilPage,
+    canMatch: [authGuard],                   // decide se a rota pode ser casada
+    canActivate: [authGuard],                // decide se pode ativar
+    canDeactivate: [pendingChangesGuard],    // impede sair com alterações não salvas
+    resolve: { perfil: perfilResolver },     // carrega dados antes de entrar
+    title: 'Perfil'
+  }
+  ```
+
+---
+
+#### 2. Componente raiz: (`src/app/app.html`)
+
+Feita a limpeza ou edição desejada no HTML raiz, certifique incluir ao menos um outlet de rota (`<router-outlet />`) sem o qual nenhuma página mapeada pelas rotas será exibida:
+
+```html
+<!-- src/app/app.html -->
+<router-outlet />
+```
+
+#### 3. Construção dos links de navegação
+
+- Importe o `RouterLink` no coponente que ativará a navegação
+
+```ts
+// src/app/pages/page1/page1.ts
+import { Component } from "@angular/core";
+import { RouterLink } from "@angular/router"; // importação
+
+@Component({
+  selector: "app-page1",
+  imports: [RouterLink], // declaração que disponibiliza o RouterLink no template do componente
+  templateUrl: "./page1.html",
+  styleUrl: "./page1.css",
+})
+export class Page1 {}
+```
+
+- Contrua o link de navegação no template do componente que ativará a navegação
+
+```html
+<!-- src/app/pages/page1/page1.html -->
+<p>page1 works!</p>
+<button routerLink="page2">Ir para página 2</button>
+<!-- 👆🏻 construção do link de navegação através de botão -->
+```
+
+### Boas práticas
+
+- **Rotas semânticas**: nomes claros (ex.: `/contato`, `/produtos`).
+- **Imports explícitos**: todo componente/diretiva/pipe usada no template deve estar em `imports` do componente standalone.
+- **Toolbar enxuta**: mantenha apenas navegação; lógica de estado/usuário vai para serviços.
+- **Acessibilidade**: use `<nav>` e `aria-current="page"` quando fizer sentido.
+
+---
+
+### Erros comuns (e como evitar)
+
+- **Esquecer de importar `RouterOutlet` ou `RouterLink/RouterLinkActive`** no componente → a navegação não renderiza/estiliza.
+- **Faltou registrar `routes`** em `app.config.ts` com `provideRouter(routes)` → o app não navega.
+- **Falta de `exact` na home** → o link da home pode ficar sempre ativo em páginas filhas.
+
+---
+
+### Exemplo completo (componentes simples com estilização) [Aula 14]
+
+1. Criados os componentes: `Home` e `Page1` na pasta **pages** e `Toolbar` na pasta **components** via comando:
+
+   ```bash
+   ng generate component pages/home && ng generate component pages/page1 && ng generate component components/toolbar
+   ```
+
+2. Registradas as rotas de navegação no arquivo `src/app/app.routes.ts`:
+
+   ```ts
+   // src/app/app.routes.ts
+   import { Routes } from "@angular/router";
+   import { Home } from "./pages/home/home";
+   import { Page1 } from "./pages/page1/page1";
+
+   export const routes: Routes = [
+     { path: "", component: Home, pathMatch: "full" },
+     { path: "page1", component: Page1 },
+     { path: "**", redirectTo: "" },
+   ];
+   ```
+
+3. Declarados **RouterOutlet** e **Toolbar** no componente raiz (`src/app/app.ts`):
+
+   ```ts
+   // src/app/app.ts
+   import { Component } from "@angular/core";
+   import { RouterOutlet } from "@angular/router";
+   import { Toolbar } from "./components/toolbar/toolbar";
+
+   @Component({
+     selector: "app-root",
+     imports: [RouterOutlet, Toolbar],
+     templateUrl: "./app.html",
+     styleUrl: "./app.scss",
+   })
+   export class App {}
+   ```
+
+4. Limpeza realizada em `src/app/app.html` e chamados os componentes _RouterOutlet_ e _Toolbar_:
+
+   ```html
+   <!-- src/app/app.html -->
+   <app-toolbar />
+   <router-outlet />
+   ```
+
+5. Construídos os templates das páginas `home` e `page1`:
+
+   ```html
+   <!-- src/app/pages/home/home.html -->
+   <h1>Você está na página HOME</h1>
+   ```
+
+   ```html
+   <!-- src/app/pages/page1/page1.html -->
+   <h1>Você está na página 1</h1>
+   ```
+
+6. Importadas e utilizadas as diretivas de rota **RouterLink**, **RouterLinkActive** ao componente `Toolbar`
+
+   ```ts
+   // src/app/components/toolbar/toolbar.ts
+   import { Component } from "@angular/core";
+   import { RouterLink, RouterLinkActive } from "@angular/router";
+
+   @Component({
+     selector: "app-toolbar",
+     imports: [RouterLink, RouterLinkActive],
+     templateUrl: "./toolbar.html",
+     styleUrl: "./toolbar.scss",
+   })
+   export class Toolbar {}
+   ```
+
+7. Definidos os estilos dos elementos no template Toolbar:
+
+   ```scss
+   // src/app/components/toolbar/toolbar.scss
+   .toolbar_container {
+     background-color: rgb(76, 76, 76);
+     overflow: hidden;
+     display: flex;
+     justify-content: center;
+   }
+
+   .toolbar_container a {
+     color: white;
+     text-align: center;
+     padding: 10px 15px;
+     text-decoration: none;
+     font-size: 18px;
+   }
+
+   .toolbar_container a:hover {
+     background-color: rgb(134, 133, 66);
+   }
+
+   .toolbar_container a.active {
+     background-color: white;
+     color: black;
+   }
+   ```
+
+8. Construídas os links de navegação no template Toolbar:
+
+   ```html
+   <!-- src/app/components/toolbar/toolbar.html -->
+   <header>
+     <div class="toolbar_container">
+       <a
+         routerLink=""
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }"
+       >
+         Página Inicial
+       </a>
+       <a routerLink="page1" routerLinkActive="active">Página 1</a>
+     </div>
+   </header>
+   ```
+
+> **Nota:**
+>
+> - **`routerLinkActive="active"`** adiciona a classe `active` quando o link corresponde à rota atual.
+> - **`[routerLinkActiveOptions]="{ exact: true }"`** na home evita que `'/'` fique ativo quando você estiver em `/page1` ou `/page2`.
+
+---
+
+---
+
+## Aula 15 - O que são Módulos em Angular
+
+> **Hoje (v20)**: prefira **standalone**; use módulos quando **fizer sentido** (libs/legado).
+
+Módulos estão em desuso desde o Angular 16. Embora aplicações **standalone** (v16+) dispensem `NgModule` para componentes/rotas/pipes/diretivas, **módulos ainda existem** e são úteis em Integração legada e migrações graduais.
+
+**Anatomia de um `NgModule`:**
+
+- `declarations` (artefatos não-standalone),
+- `imports` (dependências),
+- `exports` (o que expõe),
+- `providers` (serviços),
+- `bootstrap` (apenas em módulo raiz).
+
+---
+
+---
+
+## Aula 16 - Criando nosso primeiro Módulo [LEGADO]
+
+### Comandos usados (didático)
+
+```bash
+ng g m features/produtos --routing
+ng g m features/cadastro
+ng g m features/listagem
+```
+
+> Em projetos modernos, cadastro/listagem podem ser **standalone**. Mantemos `NgModule` aqui por ser o foco da aula.
+
+### Lazy loading por módulo (genérico)
+
+```ts
+// src/app/app.routes.ts
+import { Routes } from "@angular/router";
+
+export const routes: Routes = [
+  { path: "", redirectTo: "home", pathMatch: "full" },
+
+  // Lazy-load do módulo de produtos
+  {
+    path: "produto",
+    loadChildren: () =>
+      import("./features/produtos/produtos-module").then(
+        (m) => m.ProdutosModule
+      ),
+  },
+
+  { path: "**", redirectTo: "home" },
+];
+```
+
+```ts
+// src/app/features/produtos/produtos-routing-module.ts
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from "@angular/router";
+// (Depois você liga os componentes reais)
+const routes: Routes = [
+  { path: "", redirectTo: "listagem", pathMatch: "full" },
+  { path: "listagem" /* component: Listagem */ },
+  { path: "novo" /* component: Cadastro */ },
+];
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
+})
+export class ProdutosRoutingModule {}
+```
+
+```ts
+// src/app/features/produtos/produtos-module.ts
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { ProdutosRoutingModule } from "./produtos-routing-module";
+
+@NgModule({
+  declarations: [
+    // Listagem, Cadastro (se não-standalone)
+  ],
+  imports: [CommonModule, ProdutosRoutingModule],
+})
+export class ProdutosModule {}
+```
+
+```html
+<!-- src/app/components/toolbar/toolbar.html (trecho) -->
+<a routerLink="produto" routerLinkActive="active">Produtos</a>
+```
+
+> **Moderno:** também é possível **lazy-load de componentes/rotas standalone** (sem `NgModule`), via `loadComponent`/`loadChildren`.
+
+---
+
+---
