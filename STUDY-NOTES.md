@@ -2503,3 +2503,47 @@ export class ProdutosModule {}
 ---
 
 ---
+
+## Aula 17 - Introdução ao Angular Material
+
+**O que é:** biblioteca oficial de UI (Material Design), acessível, tematizável e responsiva.
+
+### Como adicionar
+
+```bash
+ng add @angular/material
+```
+
+Após o `ng add`, **importe apenas** o que usar no componente/módulo.
+
+**Exemplo (standalone):**
+
+```ts
+import { Component } from "@angular/core";
+
+// ⬇️ Importações dos MÓDULOS do Angular Material deste exemplo
+import { MatButtonModule } from "@angular/material/button"; // fornece diretivas/estilos dos botões
+import { MatIconModule } from "@angular/material/icon"; // fornece o componente <mat-icon>
+
+@Component({
+  selector: "app-exemplo-material",
+  standalone: true,
+  imports: [MatButtonModule, MatIconModule], // “habilita” os componentes do Material neste template
+  template: `
+    <!-- ⬇️ Diretiva/estilo do Angular Material para botão elevado -->
+    <button mat-raised-button>
+      <!-- ⬇️ Componente do Angular Material para ícones -->
+      <mat-icon>shopping_cart</mat-icon>
+      Comprar
+    </button>
+  `,
+})
+export class ExemploMaterial {}
+```
+
+**Dicas:**
+
+- **Tema:** personalize no `styles.scss`.
+- **A11y:** componentes já vêm com ARIA; garanta rótulos/contraste/foco.
+- **Performance:** importe **somente** o necessário (aproveite tree-shaking).
+- **Standalone-friendly:** funciona muito bem com standalone.
